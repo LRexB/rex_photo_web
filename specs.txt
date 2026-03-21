@@ -1,0 +1,36 @@
+This will be web server running on my account on Cloudflare.
+The URLs to direct to the server are "rexbenning.com" and "rexbenning.ca", both registered on my account with Namecheap
+
+The software shall be saved in a new repo in my account on github called rex_photo_web, which should be linked to Cloudflare for automatic updates on pushes.
+
+The web site shall have a landing page with:
+- a banner based on a selected photo image file
+- a horizontal list of the the usual standard selections such as "About", "Contact", "Help", "Search"
+- then a vertically scrolling series of horizontally scrollable displays of images and names representing photo directories (definition follows)
+- There shall be the following rows:
+  - "Latest"
+  - "Recommended"
+  - "Most Popular"
+
+For now, just the "Latest" display will be populated, the order based on the chronological order of the date characters "YYYY_MM_DD" in the photo directory name.
+
+The bottom of the page shall have the usual set of links, info, copyright notices, etc.
+
+The horizontally scrollable rows shall consist of a series of thumbnail images and titles each representing a photo directory, definition to follow.
+
+When the user clicks on one of the photo directory images, he shall be taken to a page that will display the "description" text file, and the photos in that directory.  
+The photos shall be displayed as a list or grid of elements containing a thumbnail of the photo, the file name, a title, and a summary of the metadata (date, camera, f-stop, shutter speed, iso)
+When user clicks on the photo thumbnail, the photo will be displayed on the screen in a size and format most suitable for the user's display, 
+  with the metadata displayed in a vertical area along the right side of the screen.
+
+The photo directories:
+- naming convention YYYY_MM_DD_Jobname, where jobname is a short text description or name
+- contents:   
+     - one text file with an arbitrary description of the contents of the directory.
+     - the photo image files including metadata
+         - naming convention is AAAANNNN.ext, where AAAA is a string of alphabet characters and symbols of length 0 to 8, and NNNN is a series of digits of length 0 to 8. "ext" is one of the 
+           usual extensions for photo image files such as .jpg, .pdf., tif, png, .raf, .cr2 etc.
+         - optional name is AAAANNNNTTTT.ext, where TTTT is a character string up to 12 characters long representing a titie.
+
+
+Uploading of photo directories shall be done securely via a separate update procedure to the web site directory structure.

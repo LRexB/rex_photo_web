@@ -1,0 +1,33 @@
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.gallery-main {
+  flex: 1;
+  padding: 60px 0;
+}
+
+.gallery-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 0;
+  font-size: 18px;
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .gallery-main {
+    padding: 40px 0;
+  }
+  
+  .gallery-rows {
+    gap: 50px;
+  }
+}
