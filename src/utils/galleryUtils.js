@@ -3,22 +3,43 @@
  */
 
 /**
- * Parse a gallery directory name in format YYYY_MM_DD_JobName
+ * Parse a gallery directory name in various date formats
  * @param {string} dirName - Directory name to parse
  * @returns {object} Parsed gallery information
  */
 export function parseGalleryName(dirName) {
-  const match = dirName.match(/^(\d{4})_(\d{2})_(\d{2})_(.+)$/)
+  // Try YYYY_MM_DD_JobName format first
+  let match = dirName.match(/^(\d{4})_(\d{2})_(\d{2})_(.+)$/)
   
-  if (!match) {
-    return null
+  if (match) {
+    const [, year, month, day, jobName] = match
+    return {
+      date: `${year}-${month}-${day}`,
+      jobName: jobName,
+      displayName: jobName.replace(/_/g, ' '),
+      id: dirName
+    }
   }
-
-  const [, year, month, day, jobName] = match
+  
+  // Try YY_MM_DD_JobName format (like 25_08_22EveningShots)
+  match = dirName.match(/^(\d{2})_(\d{2})_(\d{2})(.+)$/)
+  if (match) {
+    const [, yearShort, month, day, jobName] = match
+    // Assume 20xx for years 00-99
+    const year = yearShort.length === 2 ? `20${yearShort}` : yearShort
+    return {
+      date: `${year}-${month}-${day}`,
+      jobName: jobName,
+      displayName: jobName.replace(/_/g, ' '),
+      id: dirName
+    }
+  }
+  
+  // Fallback: no date parsing, just use the name
   return {
-    date: `${year}-${month}-${day}`,
-    jobName: jobName,
-    displayName: jobName.replace(/_/g, ' '),
+    date: new Date().toISOString().split('T')[0], // Today's date as fallback
+    jobName: dirName,
+    displayName: dirName.replace(/_/g, ' '),
     id: dirName
   }
 }
@@ -134,16 +155,14 @@ export function formatDate(dateString) {
  * @returns {Promise<array>} Array of gallery objects
  */
 export async function scanGalleries() {
-  // List of gallery IDs to check - update this list as you add new galleries
+  const galleries = []
+
+  // For now, we'll check the known gallery directories
+  // In a production environment, this would scan the /photos directory
   const galleryIds = [
     '2024_12_01_NewYorkTrip',
-    '2024_03_15_SpringPortrait', 
-    '2024_02_28_WinterLandscape',
-    '2023_12_10_HolidayShoot',
-    '2023_09_05_FamilyReunion'
+    '25_08_22EveningShots'
   ]
-
-  const galleries = []
 
   for (const id of galleryIds) {
     try {
@@ -182,15 +201,14 @@ export async function getGalleryPhotos(galleryId) {
   // List of potential photo filenames to check
   // Update this list as you add new photos to galleries
   const potentialFiles = [
-    // Generic patterns
-    'IMG0001.jpg', 'IMG0002.jpg', 'IMG0003.jpg',
     // New York Trip photos
-    'DSCF1941.jpg', 'DSCF1994.jpg', 'DSCF2019.jpg', 'DSCF2100.jpg', 'DSCF2320.jpg',
-    'Benning_R_SunBasking_01.jpg', 'NY Pedestrian Sign by Rex Benning.jpg',
-    // Other gallery photos
-    'SNO0001.jpg', 'SNO0002.jpg', 'SNO0003.jpg',
-    'HOL0001.jpg', 'HOL0002.jpg', 'HOL0003.jpg',
-    'FAM0001.jpg', 'FAM0002.jpg', 'FAM0003.jpg'
+    'DSCF1994.jpg', 'DSCF2019.jpg', 'DSCF2320.jpg',
+    // Evening Shots photos
+    'IMG_1867.jpg', 'IMG_1884.jpg',
+    // Generic patterns (for future galleries)
+    'IMG0001.jpg', 'IMG0002.jpg', 'IMG0003.jpg',
+    'DSCF1941.jpg', 'DSCF2100.jpg',
+    'Benning_R_SunBasking_01.jpg', 'NY Pedestrian Sign by Rex Benning.jpg'
   ]
 
   for (const filename of potentialFiles) {
