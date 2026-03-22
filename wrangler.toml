@@ -1,13 +1,15 @@
 # Cloudflare Pages configuration
-name = "rex-photo-web"
+name = 'rexphotoweb'
 main = "dist"
 compatibility_date = "2024-03-01"
+
 
 # Build configuration
 [build]
 command = "npm run build"
 cwd = "./"
 # root = "dist"
+
 
 # Environment aliases
 [env.production]
