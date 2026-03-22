@@ -170,12 +170,34 @@ export async function scanGalleries() {
         const description = await response.text()
         const parsed = parseGalleryName(id)
         if (parsed) {
+          // Find the first available photo to use as thumbnail
+          let thumbnail = '/images/default-thumbnail.jpg' // fallback
+          
+          // Get the photos for this gallery to find the first one
+          const galleryPhotoLists = {
+            '2024_12_01_NewYorkTrip': ['DSCF1994.jpg', 'DSCF2019.jpg', 'DSCF2320.jpg'],
+            '25_08_22EveningShots': ['IMG_1867.jpg', 'IMG_1884.jpg']
+          }
+          
+          const photos = galleryPhotoLists[id] || []
+          if (photos.length > 0) {
+            // Check if the first photo exists
+            try {
+              const firstPhotoResponse = await fetch(`/photos/${id}/${photos[0]}`)
+              if (firstPhotoResponse.ok) {
+                thumbnail = `/photos/${id}/${photos[0]}`
+              }
+            } catch (e) {
+              // Keep default thumbnail
+            }
+          }
+          
           galleries.push({
             id,
             date: parsed.date,
             name: parsed.displayName,
             description: description.trim(),
-            thumbnail: `/photos/${id}/thumbnail.jpg` // Will fallback if not found
+            thumbnail
           })
         }
       }
