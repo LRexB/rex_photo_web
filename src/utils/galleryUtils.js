@@ -198,17 +198,19 @@ export async function scanGalleries() {
 export async function getGalleryPhotos(galleryId) {
   const photos = []
   
-  // List of potential photo filenames to check
-  // Update this list as you add new photos to galleries
-  const potentialFiles = [
-    // New York Trip photos
-    'DSCF1994.jpg', 'DSCF2019.jpg', 'DSCF2320.jpg',
-    // Evening Shots photos
-    'IMG_1867.jpg', 'IMG_1884.jpg',
-    // Generic patterns (for future galleries)
-    'IMG0001.jpg', 'IMG0002.jpg', 'IMG0003.jpg',
-    'DSCF1941.jpg', 'DSCF2100.jpg',
-    'Benning_R_SunBasking_01.jpg', 'NY Pedestrian Sign by Rex Benning.jpg'
+  // Gallery-specific photo lists
+  const galleryPhotos = {
+    '2024_12_01_NewYorkTrip': [
+      'DSCF1994.jpg', 'DSCF2019.jpg', 'DSCF2320.jpg'
+    ],
+    '25_08_22EveningShots': [
+      'IMG_1867.jpg', 'IMG_1884.jpg'
+    ]
+  }
+  
+  // Get the photo list for this gallery, or use a default set
+  const potentialFiles = galleryPhotos[galleryId] || [
+    'IMG0001.jpg', 'IMG0002.jpg', 'IMG0003.jpg'
   ]
 
   for (const filename of potentialFiles) {
