@@ -34,10 +34,27 @@
   font-size: 14px;
   color: var(--text-light);
   transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .footer-section a:hover {
   color: var(--accent-color);
+}
+
+.nav-link-construction {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.nav-link-construction:hover {
+  color: var(--text-light) !important;
+}
+
+.construction-badge {
+  font-size: 12px;
+  display: inline-block;
 }
 
 .footer-bottom {

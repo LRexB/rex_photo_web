@@ -78,6 +78,10 @@
   cursor: not-allowed;
 }
 
+.nav-link-construction:hover {
+  color: var(--text-light) !important;
+}
+
 .construction-badge {
   font-size: 12px;
   margin-left: 4px;

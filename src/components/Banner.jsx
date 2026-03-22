@@ -16,7 +16,7 @@ function Banner() {
       <div className="banner-overlay"></div>
       <div className="banner-content">
         <h1 className="banner-title">REX BENNING</h1>
-        <p className="banner-subtitle">Professional Photography Portfolio</p>
+        <p className="banner-subtitle">Photography Portfolio</p>
       </div>
     </div>
   )
