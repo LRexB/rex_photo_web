@@ -13,3 +13,8 @@ cwd = "./"
 [env.production]
 route = "rexbenning.com"
 zone_name = "rexbenning.com"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
