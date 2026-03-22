@@ -5,7 +5,7 @@ function Banner() {
     <div className="banner">
       <div className="banner-image-wrapper">
         <img 
-          src="/images/banner-default.jpg" 
+          src="/images/banner-image.jpg" 
           alt="Portfolio Banner"
           className="banner-image"
           onError={(e) => {
