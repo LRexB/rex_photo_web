@@ -22,8 +22,9 @@ function Header() {
           <ul className="nav-menu">
             {menuItems.map((item) => (
               <li key={item}>
-                <a href={`#${item.toLowerCase()}`} className="nav-link">
+                <a href={`#${item.toLowerCase()}`} className="nav-link nav-link-construction" title="Under construction">
                   {item}
+                  <span className="construction-badge">🔨</span>
                 </a>
               </li>
             ))}
@@ -47,10 +48,12 @@ function Header() {
               <li key={item}>
                 <a 
                   href={`#${item.toLowerCase()}`} 
-                  className="nav-link"
+                  className="nav-link nav-link-construction"
                   onClick={() => setIsMenuOpen(false)}
+                  title="Under construction"
                 >
                   {item}
+                  <span className="construction-badge">🔨</span>
                 </a>
               </li>
             ))}

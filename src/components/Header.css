@@ -64,10 +64,24 @@
   color: var(--text-light);
   transition: color 0.3s ease;
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .nav-link:hover {
   color: var(--accent-color);
+}
+
+.nav-link-construction {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.construction-badge {
+  font-size: 12px;
+  margin-left: 4px;
+  display: inline-block;
 }
 
 .nav-toggle {

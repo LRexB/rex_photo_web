@@ -18,7 +18,7 @@ function LandingPage({ galleries, loading }) {
           ) : (
             <div className="gallery-rows">
               <GalleryRow 
-                title="Latest" 
+                title="Latest Galleries" 
                 galleries={galleries.latest}
               />
               <GalleryRow 
