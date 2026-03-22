@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide walks you through deploying the Rex Photo Web to Cloudflare Pages with automatic GitHub integration.
+This guide walks you through deploying Rex Photo Web to Cloudflare Pages using GitHub integration.
 
 ## Prerequisites
 
@@ -85,10 +85,7 @@ dist
 
 **Root directory:** (leave blank)
 
-**Environment variables:** (optional)
-```
-NODE_VERSION=18
-```
+**Environment variables:** leave empty unless you have a specific app variable to add.
 
 Click **Save and Deploy**
 
@@ -137,7 +134,7 @@ Alternatively, create CNAME records:
 | CNAME | www  | rex_photo_web.pages.dev                  | Auto |
 | A     | @    | [Cloudflare IP - from dashboard]        | Auto |
 
-## Step 4: Set Up Automatic Deployments
+## Step 4: Automatic Deployments
 
 ### 4a. Configure GitHub Webhooks (typically automatic)
 
@@ -259,10 +256,14 @@ Cloudflare Pages automatically provides HTTPS for:
    # Missing dependencies
    npm install
    npm run build
-   
-   # Node version mismatch
-   # Add to wrangler.toml or set in Cloudflare dashboard
    ```
+
+3. If Cloudflare asks for a "Deploy command", you are in the wrong setup flow.
+   - For this project, use standard Pages Git integration.
+   - Only configure:
+     - Build command: `npm run build`
+     - Build output directory: `dist`
+   - Do not configure a custom deploy command for normal Git-based Pages deployments.
 
 ### Site Not Updating
 
@@ -285,21 +286,46 @@ Cloudflare Pages automatically provides HTTPS for:
 2. Verify nameserver update at registrar
 3. Use DNS propagation checker: [whatsmydns.net](https://www.whatsmydns.net)
 
+### Configuration File Validation Errors
+
+If you see Pages validation errors for `wrangler.toml`:
+
+- Keep only Pages-supported keys.
+- For this project, `wrangler.toml` should be:
+
+```toml
+name = 'rexphotoweb'
+compatibility_date = "2024-03-01"
+pages_build_output_dir = "dist"
+```
+
+- Do not add Workers-style sections like `[build]` or `[env.production]` for this Pages project.
+
+### Permission Errors With API Tokens
+
+If logs mention token permission problems (for example `CLOUDFLARE_API_TOKEN`):
+
+1. Remove Cloudflare token environment variables from the Pages project unless intentionally required.
+2. Re-run deployment using standard Git integration.
+3. Confirm you are in the correct Cloudflare account in the dashboard account switcher.
+
 ## GitHub Actions (Optional)
 
-You can add automated testing to your GitHub workflow:
+You can add automated testing to GitHub Actions without deploying from Actions.
 
-Create `.github/workflows/deploy.yml`:
+If you add a workflow, keep deployment handled by Cloudflare Pages Git integration and only run checks in GitHub.
+
+Example `.github/workflows/ci.yml`:
 
 ```yaml
-name: Build and Deploy to Cloudflare Pages
+name: CI
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -315,15 +341,6 @@ jobs:
       
       - name: Build
         run: npm run build
-      
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: rex-photo-web
-          directory: dist
-          branch: main
 ```
 
 ## Maintenance

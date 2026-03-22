@@ -161,24 +161,18 @@ Currently, the application uses mock data. To integrate with real photo gallerie
    - Select your GitHub repository
    - Set build command to: `npm run build`
    - Set build output directory to: `dist`
+   - Leave deploy command empty (not required for normal Pages Git deployments)
 
 3. **Configure Custom Domains**
    - Add `rexbenning.com` as a custom domain
    - Add `rexbenning.ca` as an additional domain
    - Update DNS records at Namecheap if needed
 
-### Manual Deployment
+### Notes
 
-```bash
-# Build the project
-npm run build
-
-# Install Wrangler (Cloudflare CLI)
-npm install -g wrangler
-
-# Deploy to Cloudflare Pages
-wrangler pages deploy dist
-```
+- This project is intended to deploy through Cloudflare Pages Git integration.
+- `wrangler.toml` is kept minimal for Pages compatibility.
+- Avoid adding Workers-style sections such as `[build]` or `[env.production]` for this site.
 
 ## Styling & Theme
 
