@@ -1,6 +1,4 @@
-/**
- * Utility functions for handling photo galleries and metadata
- */
+import { parse } from 'exifr'
 
 /**
  * Parse a gallery directory name in various date formats
@@ -215,26 +213,51 @@ export async function getGalleryPhotos(galleryId) {
 
   for (const filename of potentialFiles) {
     try {
-      const response = await fetch(`/photos/${galleryId}/${filename}`)
+      const imageUrl = `/photos/${galleryId}/${filename}`
+      const response = await fetch(imageUrl)
       if (response.ok) {
         const parsed = parsePhotoFilename(filename)
+        
+        // Extract EXIF metadata
+        let metadata = {
+          date: 'Unknown',
+          camera: 'Unknown',
+          fStop: 'Unknown',
+          shutter: 'Unknown',
+          iso: 'Unknown'
+        }
+        
+        try {
+          const imageBlob = await response.blob()
+          const exifData = await parse(imageBlob, {
+            pick: ['DateTimeOriginal', 'Make', 'Model', 'FNumber', 'ExposureTime', 'ISOSpeedRatings']
+          })
+          
+          if (exifData) {
+            metadata = {
+              date: exifData.DateTimeOriginal ? new Date(exifData.DateTimeOriginal).toLocaleDateString() : 'Unknown',
+              camera: exifData.Make && exifData.Model ? `${exifData.Make} ${exifData.Model}` : 'Unknown',
+              fStop: exifData.FNumber ? `f/${exifData.FNumber}` : 'Unknown',
+              shutter: exifData.ExposureTime ? `1/${Math.round(1/exifData.ExposureTime)}s` : 'Unknown',
+              iso: exifData.ISOSpeedRatings ? exifData.ISOSpeedRatings.toString() : 'Unknown'
+            }
+          }
+        } catch (exifError) {
+          console.log(`Could not extract EXIF from ${filename}:`, exifError.message)
+        }
+        
         photos.push({
           id: parsed.number || filename.replace(/\./g, '_').replace(/\s/g, '_'),
           filename,
           title: parsed.displayTitle,
-          thumbnail: `/photos/${galleryId}/${filename}`,
-          fullsize: `/photos/${galleryId}/${filename}`,
-          metadata: {
-            date: '2024-01-01', // Would extract from EXIF in production
-            camera: 'Unknown',
-            fStop: 'f/Unknown',
-            shutter: 'Unknown',
-            iso: 'Unknown'
-          }
+          thumbnail: imageUrl,
+          fullsize: imageUrl,
+          metadata
         })
       }
     } catch (error) {
       // File doesn't exist, continue
+      console.log(`Could not load ${filename}:`, error.message)
     }
   }
 
@@ -246,6 +269,5 @@ export default {
   parsePhotoFilename,
   sortGalleriesByDate,
   filterGalleriesByDateRange,
-  extractImageMetadata,
   formatDate
 }
