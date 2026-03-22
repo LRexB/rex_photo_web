@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-03-22T23:10:00.007Z",
+  "galleries": [
+    {
+      "id": "2024_12_01_NewYorkTrip",
+      "description": "Trip to New York City, eaturing photos from various neighbourhoods and landmarks during December 2024.",
+      "photos": [
+        "DSCF1994.jpg",
+        "DSCF2019.jpg",
+        "DSCF2320.jpg"
+      ]
+    },
+    {
+      "id": "25_08_22EveningShots",
+      "description": "Pictures during an evening golden-hour walk in Kanata.",
+      "photos": [
+        "IMG_1867.jpg",
+        "IMG_1884.jpg"
+      ]
+    }
+  ]
+}

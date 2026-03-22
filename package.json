@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "generate:galleries": "node scripts/generate-gallery-manifest.mjs",
+    "dev": "npm run generate:galleries && vite",
     "build": "vite build",
+    "prebuild": "npm run generate:galleries",
     "preview": "vite preview",
     "lint": "eslint . --ext .js,.jsx"
   },

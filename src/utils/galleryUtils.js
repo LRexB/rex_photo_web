@@ -1,5 +1,28 @@
 import { parse } from 'exifr'
 
+let galleryManifestCache = null
+
+async function loadGalleryManifest() {
+  if (galleryManifestCache) {
+    return galleryManifestCache
+  }
+
+  try {
+    const response = await fetch('/photos/gallery-manifest.json', { cache: 'no-store' })
+    if (!response.ok) {
+      throw new Error(`Manifest request failed: ${response.status}`)
+    }
+
+    const manifest = await response.json()
+    galleryManifestCache = manifest
+    return manifest
+  } catch (error) {
+    console.error('Could not load gallery manifest:', error)
+    galleryManifestCache = { galleries: [] }
+    return galleryManifestCache
+  }
+}
+
 /**
  * Parse a gallery directory name in various date formats
  * @param {string} dirName - Directory name to parse
@@ -155,51 +178,32 @@ export function formatDate(dateString) {
 export async function scanGalleries() {
   const galleries = []
 
-  // For now, we'll check the known gallery directories
-  // In a production environment, this would scan the /photos directory
-  const galleryIds = [
-    '2024_12_01_NewYorkTrip',
-    '25_08_22EveningShots'
-  ]
+  const manifest = await loadGalleryManifest()
+  const galleryItems = Array.isArray(manifest.galleries) ? manifest.galleries : []
 
-  for (const id of galleryIds) {
+  for (const gallery of galleryItems) {
+    const id = gallery.id
+    if (!id) {
+      continue
+    }
+
     try {
-      // Try to fetch the description file
-      const response = await fetch(`/photos/${id}/description.txt`)
-      if (response.ok) {
-        const description = await response.text()
-        const parsed = parseGalleryName(id)
-        if (parsed) {
-          // Find the first available photo to use as thumbnail
-          let thumbnail = '/images/default-thumbnail.jpg' // fallback
-          
-          // Get the photos for this gallery to find the first one
-          const galleryPhotoLists = {
-            '2024_12_01_NewYorkTrip': ['DSCF1994.jpg', 'DSCF2019.jpg', 'DSCF2320.jpg'],
-            '25_08_22EveningShots': ['IMG_1867.jpg', 'IMG_1884.jpg']
-          }
-          
-          const photos = galleryPhotoLists[id] || []
-          if (photos.length > 0) {
-            // Check if the first photo exists
-            try {
-              const firstPhotoResponse = await fetch(`/photos/${id}/${photos[0]}`)
-              if (firstPhotoResponse.ok) {
-                thumbnail = `/photos/${id}/${photos[0]}`
-              }
-            } catch (e) {
-              // Keep default thumbnail
-            }
-          }
-          
-          galleries.push({
-            id,
-            date: parsed.date,
-            name: parsed.displayName,
-            description: description.trim(),
-            thumbnail
-          })
+      const parsed = parseGalleryName(id)
+      if (parsed) {
+        // Use first photo as thumbnail when available
+        let thumbnail = '/images/default-thumbnail.jpg'
+        const photos = Array.isArray(gallery.photos) ? gallery.photos : []
+        if (photos.length > 0) {
+          thumbnail = `/photos/${id}/${photos[0]}`
         }
+
+        galleries.push({
+          id,
+          date: parsed.date,
+          name: parsed.displayName,
+          description: (gallery.description || '').trim(),
+          thumbnail
+        })
       }
     } catch (error) {
       // Gallery doesn't exist or can't be accessed, skip it
@@ -217,21 +221,13 @@ export async function scanGalleries() {
  */
 export async function getGalleryPhotos(galleryId) {
   const photos = []
-  
-  // Gallery-specific photo lists
-  const galleryPhotos = {
-    '2024_12_01_NewYorkTrip': [
-      'DSCF1994.jpg', 'DSCF2019.jpg', 'DSCF2320.jpg'
-    ],
-    '25_08_22EveningShots': [
-      'IMG_1867.jpg', 'IMG_1884.jpg'
-    ]
-  }
-  
-  // Get the photo list for this gallery, or use a default set
-  const potentialFiles = galleryPhotos[galleryId] || [
-    'IMG0001.jpg', 'IMG0002.jpg', 'IMG0003.jpg'
-  ]
+
+  const manifest = await loadGalleryManifest()
+  const gallery = Array.isArray(manifest.galleries)
+    ? manifest.galleries.find((item) => item.id === galleryId)
+    : null
+
+  const potentialFiles = Array.isArray(gallery?.photos) ? gallery.photos : []
 
   for (const filename of potentialFiles) {
     try {
