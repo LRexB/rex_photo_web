@@ -7,7 +7,7 @@ compatibility_date = "2024-03-01"
 [build]
 command = "npm run build"
 cwd = "./"
-root = "dist"
+# root = "dist"
 
 # Environment aliases
 [env.production]
