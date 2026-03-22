@@ -230,16 +230,22 @@ export async function getGalleryPhotos(galleryId) {
         try {
           const imageBlob = await response.blob()
           const exifData = await parse(imageBlob, {
-            pick: ['DateTimeOriginal', 'Make', 'Model', 'FNumber', 'ExposureTime', 'ISOSpeedRatings']
+            pick: ['DateTimeOriginal', 'Make', 'Model', 'FNumber', 'ExposureTime', 'ISOSpeedRatings', 'ISO', 'ISOSpeed']
           })
           
           if (exifData) {
+            // Debug: log available EXIF data
+            console.log(`EXIF data for ${filename}:`, exifData)
+            
+            // Try different ISO field names
+            const isoValue = exifData.ISOSpeedRatings || exifData.ISO || exifData.ISOSpeed
+            
             metadata = {
               date: exifData.DateTimeOriginal ? new Date(exifData.DateTimeOriginal).toLocaleDateString() : 'Unknown',
               camera: exifData.Make && exifData.Model ? `${exifData.Make} ${exifData.Model}` : 'Unknown',
               fStop: exifData.FNumber ? `f/${exifData.FNumber}` : 'Unknown',
               shutter: exifData.ExposureTime ? `1/${Math.round(1/exifData.ExposureTime)}s` : 'Unknown',
-              iso: exifData.ISOSpeedRatings ? exifData.ISOSpeedRatings.toString() : 'Unknown'
+              iso: isoValue ? isoValue.toString() : 'Unknown'
             }
           }
         } catch (exifError) {
