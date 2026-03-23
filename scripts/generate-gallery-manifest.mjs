@@ -21,11 +21,28 @@ async function fileExists(filePath) {
 async function readDescription(galleryDir) {
   const descriptionPath = path.join(galleryDir, 'description.txt')
   if (!(await fileExists(descriptionPath))) {
-    return ''
+    return {
+      description: '',
+      tags: []
+    }
   }
 
   const text = await fs.readFile(descriptionPath, 'utf8')
-  return text.trim()
+  const normalizedText = text.trim()
+  const tags = Array.from(
+    new Set(
+      Array.from(normalizedText.matchAll(/(^|\s)#([\w-]+)/g), ([, , tag]) => tag.toLowerCase())
+    )
+  )
+  const description = normalizedText
+    .replace(/(^|\s)#[\w-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return {
+    description,
+    tags
+  }
 }
 
 async function getGalleryPhotos(galleryDir) {
@@ -51,11 +68,12 @@ async function generateManifest() {
   for (const id of galleryDirs) {
     const galleryDir = path.join(photosDir, id)
     const photos = await getGalleryPhotos(galleryDir)
-    const description = await readDescription(galleryDir)
+    const metadata = await readDescription(galleryDir)
 
     galleries.push({
       id,
-      description,
+      description: metadata.description,
+      tags: metadata.tags,
       photos
     })
   }

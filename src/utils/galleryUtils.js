@@ -118,6 +118,21 @@ function normalizePhotoMetadata(exifData) {
   }
 }
 
+function normalizeGalleryTags(tags) {
+  if (!Array.isArray(tags)) {
+    return []
+  }
+
+  return Array.from(
+    new Set(
+      tags
+        .filter(Boolean)
+        .map((tag) => tag.toString().trim().toLowerCase().replace(/^#/, ''))
+        .filter(Boolean)
+    )
+  )
+}
+
 async function loadGalleryManifest() {
   if (galleryManifestCache) {
     return galleryManifestCache
@@ -318,6 +333,7 @@ export async function scanGalleries() {
           date: parsed.date,
           name: parsed.displayName,
           description: (gallery.description || '').trim(),
+          tags: normalizeGalleryTags(gallery.tags),
           thumbnail
         })
       }

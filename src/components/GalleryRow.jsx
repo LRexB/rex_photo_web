@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import GalleryCard from './GalleryCard'
 import './GalleryRow.css'
 
-function GalleryRow({ title, galleries }) {
+function GalleryRow({ title, galleries, actionLabel, onAction }) {
   const scrollContainerRef = useRef(null)
   const navigate = useNavigate()
 
@@ -26,7 +26,14 @@ function GalleryRow({ title, galleries }) {
 
   return (
     <div className="gallery-row">
-      <h2 className="gallery-row-title">{title}</h2>
+      <div className="gallery-row-header">
+        <h2 className="gallery-row-title">{title}</h2>
+        {actionLabel && onAction ? (
+          <button className="gallery-row-action" onClick={onAction}>
+            {actionLabel}
+          </button>
+        ) : null}
+      </div>
       
       <div className="gallery-row-wrapper">
         <button 

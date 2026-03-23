@@ -1,9 +1,13 @@
 {
-  "generatedAt": "2026-03-23T21:57:06.835Z",
+  "generatedAt": "2026-03-23T22:27:11.781Z",
   "galleries": [
     {
       "id": "2024_01_22_NewYorkTrip",
       "description": "Trip to New York City in the winter.",
+      "tags": [
+        "newyork",
+        "winter"
+      ],
       "photos": [
         "DSCF0740-2.jpg",
         "DSCF0760_NYC Window.jpg"
@@ -12,6 +16,11 @@
     {
       "id": "2024_12_01_NewYorkTrip",
       "description": "Trip to New York City, featuring photos from various neighbourhoods and landmarks during December 2024.",
+      "tags": [
+        "newyork",
+        "winter",
+        "statenisland"
+      ],
       "photos": [
         "DSCF1994.jpg",
         "DSCF2019.jpg",
@@ -19,8 +28,28 @@
       ]
     },
     {
+      "id": "2025_03_30_NewYork",
+      "description": "Trip to New York City in the spring, featuring photos from coffee shops and jazz bars.",
+      "tags": [
+        "newyork",
+        "spring",
+        "jazzbar"
+      ],
+      "photos": [
+        "20250328_174700.jpg",
+        "20250328_174751.jpg",
+        "20250328_192129.jpg",
+        "20250328_192150.jpg",
+        "20250328_193232.jpg"
+      ]
+    },
+    {
       "id": "2025_06_10_QuebecCity",
       "description": "Trip to Quebec City.",
+      "tags": [
+        "quebeccity",
+        "jazzbar"
+      ],
       "photos": [
         "DSCF2397.jpg",
         "DSCF2503.jpg",
@@ -31,6 +60,12 @@
     {
       "id": "2025_08_22_EveningShots",
       "description": "Pictures during an evening golden-hour walk in Kanata.",
+      "tags": [
+        "kanata",
+        "goldenhour",
+        "squirrel",
+        "dandelion"
+      ],
       "photos": [
         "IMG_0766.jpg",
         "IMG_1695.jpg",

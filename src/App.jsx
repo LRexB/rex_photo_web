@@ -6,7 +6,13 @@ import { scanGalleries, sortGalleriesByDate } from './utils/galleryUtils'
 import './App.css'
 
 function App() {
-  const [galleries, setGalleries] = useState({ latest: [], recommended: [], popular: [] })
+  const [galleries, setGalleries] = useState({ all: [], latest: [], recommended: [], popular: [] })
+  const [landingSearch, setLandingSearch] = useState({
+    query: '',
+    results: [],
+    hasActiveResults: false,
+    feedback: ''
+  })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -23,6 +29,7 @@ function App() {
         const popular = []
         
         setGalleries({
+          all: allGalleries,
           latest,
           recommended,
           popular
@@ -30,7 +37,7 @@ function App() {
       } catch (error) {
         console.error('Error loading galleries:', error)
         // Fallback to empty galleries
-        setGalleries({ latest: [], recommended: [], popular: [] })
+        setGalleries({ all: [], latest: [], recommended: [], popular: [] })
       } finally {
         setLoading(false)
       }
@@ -42,7 +49,17 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage galleries={galleries} loading={loading} />} />
+        <Route
+          path="/"
+          element={(
+            <LandingPage
+              galleries={galleries}
+              loading={loading}
+              searchState={landingSearch}
+              onSearchStateChange={setLandingSearch}
+            />
+          )}
+        />
         <Route path="/gallery/:id" element={<GalleryDetail galleries={galleries} />} />
       </Routes>
     </Router>

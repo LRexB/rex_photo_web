@@ -18,8 +18,9 @@ function GalleryDetail({ galleries }) {
   useEffect(() => {
     async function loadGallery() {
       // Find the gallery from all categories
-      let gallery = null
-      if (galleries.latest) {
+      let gallery = galleries.all?.find(g => g.id === id) || null
+
+      if (!gallery && galleries.latest) {
         gallery = galleries.latest.find(g => g.id === id)
       }
       if (!gallery && galleries.recommended) {

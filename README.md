@@ -103,6 +103,15 @@ Each gallery directory should contain:
    description.txt
    ```
 
+   You can add hashtags anywhere in the file to make the gallery searchable from the home page.
+
+   Example:
+   ```
+   Trip to Quebec City in early summer. #quebec #travel #summer
+   ```
+
+   Hashtags are indexed for search and removed from the visible gallery description.
+
 2. **Photo Files** - Images with naming convention:
    - Basic: `AAAANNNN.ext` (e.g., `ABC0001.jpg`)
    - With Title: `AAAANNNNTTTT.ext` (e.g., `ABC0001Morning.jpg`)
