@@ -51,6 +51,8 @@
   overflow-x: auto;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
   flex: 1;
   
   /* Hide scrollbar */
@@ -101,6 +103,10 @@
   .gallery-row-action {
     padding: 8px 14px;
     font-size: 12px;
+  }
+
+  .gallery-row-container {
+    scroll-snap-stop: always;
   }
   
   .scroll-button {
