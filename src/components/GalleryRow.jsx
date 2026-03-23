@@ -8,16 +8,28 @@ function GalleryRow({ title, galleries, actionLabel, onAction }) {
   const navigate = useNavigate()
 
   const scroll = (direction) => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 400
-      const current = scrollContainerRef.current.scrollLeft
-      const target = direction === 'left' ? current - scrollAmount : current + scrollAmount
-      
-      scrollContainerRef.current.scrollTo({
-        left: target,
-        behavior: 'smooth'
-      })
+    const container = scrollContainerRef.current
+    if (!container) {
+      return
     }
+
+    const cards = Array.from(container.querySelectorAll('.gallery-card'))
+    if (cards.length === 0) {
+      return
+    }
+
+    const current = container.scrollLeft
+    const epsilon = 4
+
+    // Move by exactly one snap point to avoid skipping cards.
+    const targetCard = direction === 'right'
+      ? cards.find((card) => card.offsetLeft > current + epsilon) || cards[cards.length - 1]
+      : [...cards].reverse().find((card) => card.offsetLeft < current - epsilon) || cards[0]
+
+    container.scrollTo({
+      left: targetCard.offsetLeft,
+      behavior: 'smooth'
+    })
   }
 
   if (!galleries || galleries.length === 0) {
