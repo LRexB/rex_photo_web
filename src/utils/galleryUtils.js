@@ -2,6 +2,122 @@ import { parse } from 'exifr'
 
 let galleryManifestCache = null
 
+const EXIF_TAGS_TO_PICK = [
+  'DateTimeOriginal',
+  'CreateDate',
+  'ModifyDate',
+  'DateTimeDigitized',
+  'MetadataDate',
+  'Make',
+  'Model',
+  'LensModel',
+  'Lens',
+  'FNumber',
+  'ApertureValue',
+  'ExposureTime',
+  'ShutterSpeedValue',
+  'PhotographicSensitivity',
+  'ISOSpeedRatings',
+  'ISO',
+  'ISOSpeed'
+]
+
+function pickFirstDefined(...values) {
+  return values.find((value) => value !== undefined && value !== null && value !== '')
+}
+
+function formatMetadataDate(rawDate) {
+  if (!rawDate) {
+    return 'Unknown'
+  }
+
+  const parsedDate = rawDate instanceof Date ? rawDate : new Date(rawDate)
+  if (Number.isNaN(parsedDate.getTime())) {
+    return 'Unknown'
+  }
+
+  return parsedDate.toLocaleDateString()
+}
+
+function formatCameraName(make, model) {
+  const parts = [make, model]
+    .filter(Boolean)
+    .map((part) => part.trim())
+    .filter(Boolean)
+
+  if (parts.length === 0) {
+    return 'Unknown'
+  }
+
+  if (parts.length === 2 && parts[0].toLowerCase() === parts[1].toLowerCase()) {
+    return parts[0]
+  }
+
+  return parts.join(' ')
+}
+
+function formatAperture(fNumber, apertureValue) {
+  const aperture = pickFirstDefined(fNumber, apertureValue)
+  if (typeof aperture !== 'number' || Number.isNaN(aperture)) {
+    return 'Unknown'
+  }
+
+  return `f/${Number(aperture.toFixed(1))}`
+}
+
+function formatShutterSpeed(exposureTime, shutterSpeedValue) {
+  if (typeof exposureTime === 'number' && Number.isFinite(exposureTime) && exposureTime > 0) {
+    if (exposureTime >= 1) {
+      return `${Number(exposureTime.toFixed(1))}s`
+    }
+
+    return `1/${Math.round(1 / exposureTime)}s`
+  }
+
+  if (typeof shutterSpeedValue === 'number' && Number.isFinite(shutterSpeedValue)) {
+    const derivedExposureTime = 2 ** (-shutterSpeedValue)
+    if (derivedExposureTime > 0) {
+      return `1/${Math.round(1 / derivedExposureTime)}s`
+    }
+  }
+
+  return 'Unknown'
+}
+
+function normalizePhotoMetadata(exifData) {
+  if (!exifData) {
+    return {
+      date: 'Unknown',
+      camera: 'Unknown',
+      fStop: 'Unknown',
+      shutter: 'Unknown',
+      iso: 'Unknown'
+    }
+  }
+
+  const captureDate = pickFirstDefined(
+    exifData.DateTimeOriginal,
+    exifData.CreateDate,
+    exifData.DateTimeDigitized,
+    exifData.ModifyDate,
+    exifData.MetadataDate
+  )
+  const isoValue = pickFirstDefined(
+    exifData.PhotographicSensitivity,
+    exifData.ISOSpeedRatings,
+    exifData.ISO,
+    exifData.ISOSpeed
+  )
+
+  return {
+    date: formatMetadataDate(captureDate),
+    camera: formatCameraName(exifData.Make, exifData.Model),
+    fStop: formatAperture(exifData.FNumber, exifData.ApertureValue),
+    shutter: formatShutterSpeed(exifData.ExposureTime, exifData.ShutterSpeedValue),
+    iso: isoValue ? isoValue.toString() : 'Unknown'
+  }
+}
+
 async function loadGalleryManifest() {
   if (galleryManifestCache) {
     return galleryManifestCache
@@ -235,41 +351,24 @@ export async function getGalleryPhotos(galleryId) {
       const response = await fetch(imageUrl)
       if (response.ok) {
         const parsed = parsePhotoFilename(filename)
-        
+
         // Extract EXIF metadata
-        let metadata = {
-          date: 'Unknown',
-          camera: 'Unknown',
-          fStop: 'Unknown',
-          shutter: 'Unknown',
-          iso: 'Unknown'
-        }
-        
+        let metadata = normalizePhotoMetadata(null)
+
         try {
           const imageBlob = await response.blob()
           const exifData = await parse(imageBlob, {
-            pick: ['DateTimeOriginal', 'Make', 'Model', 'FNumber', 'ExposureTime', 'ISOSpeedRatings', 'ISO', 'ISOSpeed']
+            xmp: true,
+            pick: EXIF_TAGS_TO_PICK
           })
-          
+
           if (exifData) {
-            // Debug: log available EXIF data
-            console.log(`EXIF data for ${filename}:`, exifData)
-            
-            // Try different ISO field names
-            const isoValue = exifData.ISOSpeedRatings || exifData.ISO || exifData.ISOSpeed
-            
-            metadata = {
-              date: exifData.DateTimeOriginal ? new Date(exifData.DateTimeOriginal).toLocaleDateString() : 'Unknown',
-              camera: exifData.Make && exifData.Model ? `${exifData.Make} ${exifData.Model}` : 'Unknown',
-              fStop: exifData.FNumber ? `f/${exifData.FNumber}` : 'Unknown',
-              shutter: exifData.ExposureTime ? `1/${Math.round(1/exifData.ExposureTime)}s` : 'Unknown',
-              iso: isoValue ? isoValue.toString() : 'Unknown'
-            }
+            metadata = normalizePhotoMetadata(exifData)
           }
         } catch (exifError) {
           console.log(`Could not extract EXIF from ${filename}:`, exifError.message)
         }
-        
+
         photos.push({
           id: parsed.number || filename.replace(/\./g, '_').replace(/\s/g, '_'),
           filename,

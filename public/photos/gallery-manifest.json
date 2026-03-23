@@ -1,9 +1,17 @@
 {
-  "generatedAt": "2026-03-22T23:10:00.007Z",
+  "generatedAt": "2026-03-23T21:57:06.835Z",
   "galleries": [
     {
+      "id": "2024_01_22_NewYorkTrip",
+      "description": "Trip to New York City in the winter.",
+      "photos": [
+        "DSCF0740-2.jpg",
+        "DSCF0760_NYC Window.jpg"
+      ]
+    },
+    {
       "id": "2024_12_01_NewYorkTrip",
-      "description": "Trip to New York City, eaturing photos from various neighbourhoods and landmarks during December 2024.",
+      "description": "Trip to New York City, featuring photos from various neighbourhoods and landmarks during December 2024.",
       "photos": [
         "DSCF1994.jpg",
         "DSCF2019.jpg",
@@ -11,9 +19,21 @@
       ]
     },
     {
-      "id": "25_08_22EveningShots",
+      "id": "2025_06_10_QuebecCity",
+      "description": "Trip to Quebec City.",
+      "photos": [
+        "DSCF2397.jpg",
+        "DSCF2503.jpg",
+        "IMG_0950-1.jpg",
+        "photo_2025-06-10.jpg"
+      ]
+    },
+    {
+      "id": "2025_08_22_EveningShots",
       "description": "Pictures during an evening golden-hour walk in Kanata.",
       "photos": [
+        "IMG_0766.jpg",
+        "IMG_1695.jpg",
         "IMG_1867.jpg",
         "IMG_1884.jpg"
       ]
