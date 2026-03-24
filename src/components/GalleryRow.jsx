@@ -19,15 +19,15 @@ function GalleryRow({ title, galleries, actionLabel, onAction }) {
     }
 
     const current = container.scrollLeft
-    const epsilon = 4
-
-    // Move by exactly one snap point to avoid skipping cards.
-    const targetCard = direction === 'right'
-      ? cards.find((card) => card.offsetLeft > current + epsilon) || cards[cards.length - 1]
-      : [...cards].reverse().find((card) => card.offsetLeft < current - epsilon) || cards[0]
+    const cardWidth = cards[0].getBoundingClientRect().width
+    const styles = window.getComputedStyle(container)
+    const gapValue = parseFloat(styles.gap || styles.columnGap || '0')
+    const step = cardWidth + (Number.isFinite(gapValue) ? gapValue : 0)
+    const delta = direction === 'right' ? step : -step
+    const target = Math.max(0, current + delta)
 
     container.scrollTo({
-      left: targetCard.offsetLeft,
+      left: target,
       behavior: 'smooth'
     })
   }
