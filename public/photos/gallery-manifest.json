@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-03-23T22:27:11.781Z",
+  "generatedAt": "2026-03-24T20:46:11.306Z",
   "galleries": [
     {
-      "id": "2024_01_22_NewYorkTrip",
+      "id": "2024_01_22_New York Trip",
       "description": "Trip to New York City in the winter.",
       "tags": [
         "newyork",
         "winter"
       ],
       "photos": [
-        "DSCF0740-2.jpg",
+        "DSCF0740_Snowy Bicycle.jpg",
         "DSCF0760_NYC Window.jpg"
       ]
     },
     {
-      "id": "2024_12_01_NewYorkTrip",
+      "id": "2024_12_01_New York Trip",
       "description": "Trip to New York City, featuring photos from various neighbourhoods and landmarks during December 2024.",
       "tags": [
         "newyork",
@@ -22,13 +22,13 @@
         "statenisland"
       ],
       "photos": [
-        "DSCF1994.jpg",
-        "DSCF2019.jpg",
-        "DSCF2320.jpg"
+        "DSCF1994_Central Park Runner.jpg",
+        "DSCF2019_Central Park Skyline.jpg",
+        "DSCF2320_Wind on Staten Island Ferry.jpg"
       ]
     },
     {
-      "id": "2025_03_30_NewYork",
+      "id": "2025_03_30_New York",
       "description": "Trip to New York City in the spring, featuring photos from coffee shops and jazz bars.",
       "tags": [
         "newyork",
@@ -36,29 +36,26 @@
         "jazzbar"
       ],
       "photos": [
-        "20250328_174700.jpg",
-        "20250328_174751.jpg",
-        "20250328_192129.jpg",
-        "20250328_192150.jpg",
-        "20250328_193232.jpg"
+        "IMG174751_Coffee Shop.jpg",
+        "IMG192150_Jazz Bar.jpg"
       ]
     },
     {
-      "id": "2025_06_10_QuebecCity",
+      "id": "2025_06_10_Quebec City",
       "description": "Trip to Quebec City.",
       "tags": [
         "quebeccity",
         "jazzbar"
       ],
       "photos": [
-        "DSCF2397.jpg",
-        "DSCF2503.jpg",
-        "IMG_0950-1.jpg",
-        "photo_2025-06-10.jpg"
+        "DSCF2397_Night Mimes.jpg",
+        "DSCF2503_Glimpse Through City Wall.jpg",
+        "IMG0950_Sunset Spire.jpg",
+        "IMG20250610_Classical Guitar.jpg"
       ]
     },
     {
-      "id": "2025_08_22_EveningShots",
+      "id": "2025_08_22_Evening Shots",
       "description": "Pictures during an evening golden-hour walk in Kanata.",
       "tags": [
         "kanata",
@@ -67,10 +64,10 @@
         "dandelion"
       ],
       "photos": [
-        "IMG_0766.jpg",
-        "IMG_1695.jpg",
-        "IMG_1867.jpg",
-        "IMG_1884.jpg"
+        "IMG0766_Squirrel.jpg",
+        "IMG1695_Power Line Sunset.jpg",
+        "IMG1867_Dandelion.jpg",
+        "IMG1884_Thistles.jpg"
       ]
     }
   ]
