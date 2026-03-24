@@ -1,12 +1,15 @@
 {
-  "generatedAt": "2026-03-24T20:46:11.306Z",
+  "generatedAt": "2026-03-24T21:20:17.185Z",
   "galleries": [
     {
       "id": "2024_01_22_New York Trip",
       "description": "Trip to New York City in the winter.",
       "tags": [
         "newyork",
-        "winter"
+        "winter",
+        "bicycle",
+        "frost",
+        "windowview"
       ],
       "photos": [
         "DSCF0740_Snowy Bicycle.jpg",
@@ -33,7 +36,8 @@
       "tags": [
         "newyork",
         "spring",
-        "jazzbar"
+        "jazzbar",
+        "coffeeshop"
       ],
       "photos": [
         "IMG174751_Coffee Shop.jpg",
@@ -45,7 +49,10 @@
       "description": "Trip to Quebec City.",
       "tags": [
         "quebeccity",
-        "jazzbar"
+        "jazzbar",
+        "sunset",
+        "churchspire",
+        "guitarplayer"
       ],
       "photos": [
         "DSCF2397_Night Mimes.jpg",
@@ -61,13 +68,29 @@
         "kanata",
         "goldenhour",
         "squirrel",
-        "dandelion"
+        "dandelion",
+        "sunset",
+        "thistle"
       ],
       "photos": [
         "IMG0766_Squirrel.jpg",
         "IMG1695_Power Line Sunset.jpg",
         "IMG1867_Dandelion.jpg",
         "IMG1884_Thistles.jpg"
+      ]
+    },
+    {
+      "id": "2026_03_24_SPAO Entries",
+      "description": "Pictures entered into the SPAO APEX competition.",
+      "tags": [
+        "spao"
+      ],
+      "photos": [
+        "IMG001_Covid Kids.jpg",
+        "IMG002_Flower Negative.jpg",
+        "IMG003_Flower Positive.jpg",
+        "IMG004_Flower  Shadows.jpg",
+        "IMG005_Parabolas.jpg"
       ]
     }
   ]
