@@ -1,6 +1,24 @@
 {
-  "generatedAt": "2026-03-24T21:25:53.130Z",
+  "generatedAt": "2026-03-30T00:48:04.864Z",
   "galleries": [
+    {
+      "id": "2023_06_01_Amtrak Trip",
+      "description": "Trip on Amtrak from Montreal to California, mostly on the California Zephyr from Chicago.",
+      "tags": [
+        "amtrak",
+        "chicago",
+        "railway",
+        "sacramento",
+        "train",
+        "californiazephyr"
+      ],
+      "photos": [
+        "DSCF0427_Sacramento.jpg",
+        "DSCF0495_San Luis Obispo.jpg",
+        "DSCF0687_Chicago Station.jpg",
+        "DSCF0719_Chicago Station Main Hall.jpg"
+      ]
+    },
     {
       "id": "2024_01_22_New York Trip",
       "description": "Trip to New York City in the winter.",

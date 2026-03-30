@@ -21,7 +21,7 @@ function App() {
         const allGalleries = await scanGalleries()
         
         // Sort by date for latest
-        const latest = sortGalleriesByDate(allGalleries).slice(0, 5)
+        const latest = sortGalleriesByDate(allGalleries)
         
         // For now, put all galleries in latest. In production, you'd have
         // logic to categorize them as recommended/popular based on metadata
