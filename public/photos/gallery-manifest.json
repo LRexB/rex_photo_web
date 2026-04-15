@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-30T00:48:04.864Z",
+  "generatedAt": "2026-04-15T23:26:03.682Z",
   "galleries": [
     {
       "id": "2023_06_01_Amtrak Trip",
@@ -98,10 +98,45 @@
       ]
     },
     {
-      "id": "2026_03_24_SPAO Entries",
-      "description": "Pictures entered into the SPAO APEX competition.",
+      "id": "2025_08_26_Glassware Promotional Lighting",
+      "description": "Photos of glassware taken to demonstrate various lighting effects for use in promotional shots.",
       "tags": [
-        "spao"
+        "glassware",
+        "lightingeffects",
+        "advertising",
+        "promotions"
+      ],
+      "photos": [
+        "IMG_1845 Red Mug.jpg",
+        "IMG_1891 Wine Glass 1.jpg",
+        "IMG_1892 Wine Glass 2.jpg",
+        "IMG_1898 Beer Glass 1.jpg",
+        "IMG_1902 Beer Glass 2.jpg"
+      ]
+    },
+    {
+      "id": "2026_03_12_Ottawa Ice Storm",
+      "description": "The aftermath of another Ottawa Ice Storm.",
+      "tags": [
+        "nature",
+        "icicles",
+        "winter",
+        "icestorm",
+        "ice"
+      ],
+      "photos": [
+        "IMG_3089 Iced Trees.jpg",
+        "IMG_3107 Iced Flowers.jpg",
+        "IMG_3116 Iced Branches.jpg"
+      ]
+    },
+    {
+      "id": "2026_03_24_SPAO Entries",
+      "description": "Pictures entered into the School of the Photographic Arts, Ottawa, APEX competition.",
+      "tags": [
+        "spao",
+        "competition",
+        "exhibition"
       ],
       "photos": [
         "IMG001_Covid Kids.jpg",

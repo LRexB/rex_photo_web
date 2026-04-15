@@ -6,15 +6,22 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate()
 
-  const menuItems = ['About', 'Contact', 'Help', 'Search']
+  const menuItems = ['About', 'Contact', 'Help']
 
   return (
     <header className="header">
       <div className="header-container">
         <div className="header-logo">
           <button onClick={() => navigate('/')} className="logo-button">
-            <span className="logo-text">REX BENNING</span>
-            <span className="logo-subtitle">PHOTOGRAPHY</span>
+            <img
+              src="/photos/Rex 2 B&W.jpg"
+              alt="Rex Benning"
+              className="logo-thumbnail"
+            />
+            <div className="logo-text-group">
+              <span className="logo-text">REX BENNING</span>
+              <span className="logo-subtitle">PHOTOGRAPHY</span>
+            </div>
           </button>
         </div>
 

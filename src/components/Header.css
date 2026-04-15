@@ -22,9 +22,25 @@
 
 .logo-button {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  transition: opacity 0.3s ease;
+}
+
+.logo-thumbnail {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 25%;
+  border: 2px solid var(--accent-color);
+}
+
+.logo-text-group {
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
-  transition: opacity 0.3s ease;
 }
 
 .logo-button:hover {

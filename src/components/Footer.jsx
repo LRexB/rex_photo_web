@@ -31,8 +31,8 @@ function Footer() {
         <div className="footer-section">
           <h3>Sites</h3>
           <ul>
-            <li><a href="#" className="nav-link-construction" title="Under construction" onClick={handleConstructionClick}>rexbenning.com <span className="construction-badge">🔨</span></a></li>
-            <li><a href="#" className="nav-link-construction" title="Under construction" onClick={handleConstructionClick}>rexbenning.ca <span className="construction-badge">🔨</span></a></li>
+            <li><a href="/">rexbenning.com</a></li>
+            <li><a href="/">rexbenning.ca</a></li>
           </ul>
         </div>
       </div>
