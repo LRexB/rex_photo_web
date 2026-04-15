@@ -10,12 +10,12 @@
 }
 
 .gallery-row-title {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 600;
   letter-spacing: 1px;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
   color: var(--text-light);
-  padding-bottom: 15px;
+  padding-bottom: 10px;
   border-bottom: 2px solid var(--accent-color);
 }
 

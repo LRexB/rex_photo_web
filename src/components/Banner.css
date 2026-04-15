@@ -1,6 +1,6 @@
 .banner {
   position: relative;
-  height: 500px;
+  height: 400px;
   overflow: hidden;
   margin-top: 0;
 }
@@ -44,16 +44,16 @@
 }
 
 .banner-title {
-  font-size: 64px;
+  font-size: 48px;
   font-weight: 700;
-  letter-spacing: 4px;
-  margin-bottom: 15px;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
   color: var(--text-light);
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 .banner-subtitle {
-  font-size: 22px;
+  font-size: 17px;
   letter-spacing: 2px;
   color: var(--accent-color);
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
@@ -61,16 +61,16 @@
 
 @media (max-width: 768px) {
   .banner {
-    height: 300px;
+    height: 250px;
   }
   
   .banner-title {
-    font-size: 42px;
+    font-size: 32px;
     letter-spacing: 2px;
   }
   
   .banner-subtitle {
-    font-size: 16px;
+    font-size: 14px;
     letter-spacing: 1px;
   }
 }
