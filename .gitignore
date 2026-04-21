@@ -34,3 +34,4 @@ logs/
 
 # Wrangler local state
 .wrangler/
+public/photos/
