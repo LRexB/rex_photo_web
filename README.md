@@ -1,6 +1,6 @@
 # Rex Photo Web - Photography Portfolio Website
 
-A modern, responsive web application for displaying photography portfolios. Built with React, Vite, and designed for deployment on Cloudflare Pages.
+A modern, responsive web application for displaying photography portfolios. Built with React, Vite, and deployed on Cloudflare Pages with images hosted on Cloudflare R2.
 
 ## Features
 
@@ -23,35 +23,30 @@ A modern, responsive web application for displaying photography portfolios. Buil
 ├── package.json              # Dependencies and scripts
 ├── vite.config.js           # Vite configuration
 ├── wrangler.toml            # Cloudflare deployment config
+├── scripts/
+│   ├── generate-gallery-manifest.mjs  # Scans photos, generates manifest
+│   └── upload-to-r2.sh               # Uploads photos to Cloudflare R2
 ├── src/
 │   ├── main.jsx             # React entry point
 │   ├── App.jsx              # Main app component with routing
-│   ├── App.css              # App-level styles
-│   ├── index.css            # Global styles
+│   ├── config/
+│   │   └── imageConfig.js   # R2 image base URL configuration
 │   ├── pages/
 │   │   ├── LandingPage.jsx   # Home page
-│   │   ├── LandingPage.css
-│   │   ├── GalleryDetail.jsx # Individual gallery page
-│   │   └── GalleryDetail.css
+│   │   └── GalleryDetail.jsx # Individual gallery page
 │   ├── components/
 │   │   ├── Header.jsx        # Navigation header
-│   │   ├── Header.css
 │   │   ├── Banner.jsx        # Page banner with image
-│   │   ├── Banner.css
 │   │   ├── GalleryRow.jsx    # Horizontally scrollable row
-│   │   ├── GalleryRow.css
 │   │   ├── GalleryCard.jsx   # Gallery preview card
-│   │   ├── GalleryCard.css
 │   │   ├── PhotoGrid.jsx     # Photo grid display
-│   │   ├── PhotoGrid.css
 │   │   ├── PhotoLightbox.jsx # Full-size photo viewer
-│   │   ├── PhotoLightbox.css
-│   │   ├── Footer.jsx        # Page footer
-│   │   └── Footer.css
+│   │   └── Footer.jsx        # Page footer
 │   └── utils/
-│       └── galleryUtils.js   # Utility functions
-├── public/                   # Static images folder
-│   └── images/              # Banner and default images
+│       └── galleryUtils.js   # Gallery loading and EXIF extraction
+├── public/
+│   ├── images/              # Banner and default images
+│   └── photos/              # Local photo backup (served from R2)
 └── specs.txt                # Project specifications
 ```
 
@@ -127,29 +122,19 @@ The system displays the following metadata for each photo:
 - **Shutter Speed**: Exposure duration
 - **ISO**: Film/sensor sensitivity
 
-## Data Fetching
+## Image Hosting
 
-Currently, the application uses mock data. To integrate with real photo galleries:
+Photos are hosted on **Cloudflare R2** and served via the custom domain `images.rexbenning.com`.
 
-1. **API Integration**: Modify `src/App.jsx` to fetch galleries from your API
-2. **File System Scanning**: Set up a backend service to scan the photo directories
-3. **Metadata Extraction**: Implement EXIF reading to automatically extract camera settings
+| Component | Location |
+|---|---|
+| R2 Bucket | `rex-photos` |
+| Custom Domain | `https://images.rexbenning.com` |
+| Config | `src/config/imageConfig.js` |
 
-### Mock Data Structure
+The app loads a `gallery-manifest.json` from R2 that lists all galleries and their photos. Images are fetched directly from R2 with EXIF metadata extracted client-side.
 
-```javascript
-{
-  latest: [
-    {
-      id: '2024_03_15_SpringPortrait',
-      date: '2024-03-15',
-      name: 'Spring Portrait',
-      thumbnail: '/images/thumb.jpg',
-      description: 'Gallery description...'
-    }
-  ]
-}
-```
+To switch back to local image serving (e.g., for offline development), set `IMAGE_BASE_URL` to `''` in `src/config/imageConfig.js`.
 
 ## Deployment
 
@@ -223,18 +208,50 @@ VITE_API_URL=https://api.example.com
 VITE_IMAGE_PATH=/photos
 ```
 
-## Photo Upload Procedure
+## Adding or Updating Galleries
 
-A secure upload mechanism needs to be implemented separately:
+Photos are managed locally in `public/photos/` and uploaded to Cloudflare R2.
 
-1. Create a backend service to handle file uploads
-2. Validate gallery directory names
-3. Scan for photos and extract metadata
-4. Generate thumbnails
-5. Store in appropriate directory structure
-6. Trigger deployment to update the website
+### Adding a New Gallery
 
-(This is mentioned in specs as a separate update procedure)
+1. **Create the gallery folder** in `public/photos/`:
+   ```bash
+   mkdir "public/photos/2026_05_10_Gallery Name"
+   ```
+
+2. **Add photos** (JPEG, PNG, WebP) to the folder
+
+3. **Add a description** file:
+   ```bash
+   echo "Gallery description text. #tag1 #tag2" > "public/photos/2026_05_10_Gallery Name/description.txt"
+   ```
+
+4. **Regenerate the manifest** (scans all galleries):
+   ```bash
+   node scripts/generate-gallery-manifest.mjs
+   ```
+
+5. **Upload to R2**:
+   ```bash
+   bash scripts/upload-to-r2.sh
+   ```
+   This uploads all photos and the updated manifest to Cloudflare R2.
+
+6. **Verify** — visit `https://images.rexbenning.com/photos/gallery-manifest.json` to confirm the manifest is updated.
+
+### Updating an Existing Gallery
+
+To add or remove photos from an existing gallery:
+
+1. Add/remove files in the `public/photos/YYYY_MM_DD_GalleryName/` folder
+2. Re-run the manifest generator: `node scripts/generate-gallery-manifest.mjs`
+3. Re-run the upload: `bash scripts/upload-to-r2.sh`
+
+### Upload Script Prerequisites
+
+- **wrangler** CLI installed: `npm install -g wrangler`
+- Authenticated to Cloudflare: `npx wrangler login`
+- The `--remote` flag must be used (included in the script) to upload to the actual R2 bucket
 
 ## Performance Tips
 
@@ -292,4 +309,5 @@ For questions or support, contact Rex Benning directly.
 - React 18
 - Vite 5
 - React Router 6
-- Cloudflare Pages
+- Cloudflare Pages (site hosting)
+- Cloudflare R2 (image storage)

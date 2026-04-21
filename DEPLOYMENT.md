@@ -164,37 +164,40 @@ git push origin main
 
 ## Step 5: Add Photo Galleries
 
-### 5a. Create Photos Directory
+Photos are hosted on Cloudflare R2, not committed to git.
+
+### 5a. Set Up R2 (One-Time)
+
+1. In Cloudflare Dashboard → **R2 Object Storage** → create bucket `rex-photos`
+2. In bucket **Settings** → **Custom Domains** → connect `images.rexbenning.com`
+3. Add CORS policy allowing your site origins (see `scripts/upload-to-r2.sh` for details)
+
+### 5b. Add a New Gallery
 
 ```bash
-# Create photos directory
-mkdir -p public/photos
+# Create gallery directory
+mkdir "public/photos/2026_05_10_Gallery Name"
 
-# Create first gallery
-mkdir "public/photos/2024_03_15_SpringPortrait"
-echo "Spring portrait collection" > "public/photos/2024_03_15_SpringPortrait/description.txt"
+# Add photos to the directory
+cp your-photos/*.jpg "public/photos/2026_05_10_Gallery Name/"
 
-# Add sample images (you'll add real ones)
-# cp your-image.jpg "public/photos/2024_03_15_SpringPortrait/IMG0001.jpg"
+# Add description with optional hashtags
+echo "Description of the gallery. #landscape #nature" > "public/photos/2026_05_10_Gallery Name/description.txt"
 ```
 
-### 5b. Add Photo Files
-
-1. Follow the directory structure from GALLERY_STRUCTURE.md
-2. Add image files locally
-3. Ensure filenames follow naming conventions
-4. Add description.txt to each gallery
-
-### 5c. Update and Deploy
+### 5c. Generate Manifest and Upload
 
 ```bash
-# After adding photos
-git add public/photos/
-git commit -m "Add spring portrait gallery"
-git push origin main
+# Regenerate the gallery manifest
+node scripts/generate-gallery-manifest.mjs
 
-# Visit your sites to see updates!
+# Upload all photos and manifest to R2
+bash scripts/upload-to-r2.sh
 ```
+
+### 5d. Verify
+
+Visit `https://images.rexbenning.com/photos/gallery-manifest.json` to confirm the new gallery appears. The website will pick up the changes immediately — no git push or redeploy needed for photo changes.
 
 ## Step 6: SSL/HTTPS Setup
 
@@ -378,9 +381,9 @@ jobs:
    - Use tools like ImageOptim or TinyPNG
    - Target: <2MB per image
 
-2. **Enable gzip compression** (default in Cloudflare)
-3. **Monitor Core Web Vitals** in Cloudflare Analytics
-4. **Use CDN cache headers** effectively
+2. **R2 CDN**: Images served from R2 via custom domain are automatically cached at Cloudflare's edge
+3. **Enable gzip compression** (default in Cloudflare)
+4. **Monitor Core Web Vitals** in Cloudflare Analytics
 
 ## Support & Resources
 

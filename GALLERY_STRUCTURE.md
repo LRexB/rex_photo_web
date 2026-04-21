@@ -147,24 +147,38 @@ For optimal performance:
 
 ## Directory Placement
 
-On your web server, photo galleries should be placed in:
+Photo galleries are stored locally in:
 ```
 /public/photos/
 ```
 
-The system will scan this directory for galleries matching the naming convention.
+The system scans this directory to generate a `gallery-manifest.json`, which is then uploaded alongside the photos to **Cloudflare R2** for serving.
+
+| Resource | Location |
+|---|---|
+| Local source | `public/photos/` |
+| R2 bucket | `rex-photos` |
+| Served from | `https://images.rexbenning.com/photos/` |
 
 ## Upload Procedure
 
 When adding new galleries:
 
-1. Create directory with proper naming format
-2. Add description.txt file
+1. Create directory with proper naming format in `public/photos/`
+2. Add `description.txt` file (include `#hashtags` for search)
 3. Place image files with proper naming
 4. Ensure EXIF metadata is intact (if available)
-5. Test locally with development server
-6. Commit to Git and push to GitHub
-7. Cloudflare Pages will automatically deploy
+5. Regenerate the manifest:
+   ```bash
+   node scripts/generate-gallery-manifest.mjs
+   ```
+6. Upload to Cloudflare R2:
+   ```bash
+   bash scripts/upload-to-r2.sh
+   ```
+7. Verify at `https://images.rexbenning.com/photos/gallery-manifest.json`
+
+**Note:** You do not need to commit photos to git or push to GitHub for them to appear on the site. The upload script sends files directly to R2.
 
 ## Example Complete Gallery
 
@@ -202,10 +216,11 @@ Featuring diverse subjects and candid moments from three different sessions thro
 - Try recreating metadata file if needed
 
 ### Images Not Loading
-- Verify file extensions are correct (lowercase preferred)
-- Check file permissions (must be readable)
-- Ensure image files aren't corrupted
-- Try re-exporting from original
+- Verify photos were uploaded to R2: check the Cloudflare R2 dashboard
+- Test the URL directly: `https://images.rexbenning.com/photos/{gallery}/{filename}`
+- Check CORS policy in R2 bucket settings if browser console shows CORS errors
+- Ensure `gallery-manifest.json` was regenerated and uploaded after adding photos
+- Verify filenames match those in the manifest (check for extra spaces)
 
 ---
 

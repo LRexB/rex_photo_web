@@ -49,7 +49,7 @@ find "$SOURCE_DIR" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -
     esac
 
     echo "  ⬆ $key"
-    if npx wrangler r2 object put "$BUCKET/$key" --file="$file" --content-type="$content_type" 2>/dev/null; then
+    if npx wrangler r2 object put "$BUCKET/$key" --file="$file" --content-type="$content_type" --remote 2>/dev/null; then
         UPLOADED=$((UPLOADED + 1))
     else
         echo "  ❌ FAILED: $key"
