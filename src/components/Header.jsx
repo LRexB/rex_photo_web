@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { IMAGE_BASE_URL } from '../config/imageConfig'
 import './Header.css'
 
 function Header() {
@@ -14,7 +15,7 @@ function Header() {
         <div className="header-logo">
           <button onClick={() => navigate('/')} className="logo-button">
             <img
-              src="/photos/Rex 2 B&W.jpg"
+              src={`${IMAGE_BASE_URL}/photos/Rex 2 B&W.jpg`}
               alt="Rex Benning"
               className="logo-thumbnail"
             />

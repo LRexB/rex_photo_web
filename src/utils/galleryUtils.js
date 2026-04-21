@@ -1,4 +1,5 @@
 import { parse } from 'exifr'
+import { IMAGE_BASE_URL } from '../config/imageConfig'
 
 let galleryManifestCache = null
 
@@ -139,7 +140,7 @@ async function loadGalleryManifest() {
   }
 
   try {
-    const response = await fetch('/photos/gallery-manifest.json', { cache: 'no-store' })
+    const response = await fetch(`${IMAGE_BASE_URL}/photos/gallery-manifest.json`, { cache: 'no-store' })
     if (!response.ok) {
       throw new Error(`Manifest request failed: ${response.status}`)
     }
@@ -325,7 +326,7 @@ export async function scanGalleries() {
         let thumbnail = '/images/default-thumbnail.jpg'
         const photos = Array.isArray(gallery.photos) ? gallery.photos : []
         if (photos.length > 0) {
-          thumbnail = `/photos/${id}/${photos[0]}`
+          thumbnail = `${IMAGE_BASE_URL}/photos/${id}/${photos[0]}`
         }
 
         galleries.push({
@@ -363,7 +364,7 @@ export async function getGalleryPhotos(galleryId) {
 
   for (const filename of potentialFiles) {
     try {
-      const imageUrl = `/photos/${galleryId}/${filename}`
+      const imageUrl = `${IMAGE_BASE_URL}/photos/${galleryId}/${filename}`
       const response = await fetch(imageUrl)
       if (response.ok) {
         const parsed = parsePhotoFilename(filename)
