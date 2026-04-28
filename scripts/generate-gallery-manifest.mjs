@@ -56,6 +56,13 @@ async function getGalleryPhotos(galleryDir) {
 }
 
 async function generateManifest() {
+  // Photos live on R2 and are excluded from git, so public/photos
+  // won't exist on CI/CD build servers. Skip gracefully.
+  if (!(await fileExists(photosDir))) {
+    console.log('No public/photos directory found — skipping manifest generation (photos are on R2)')
+    return
+  }
+
   const dirEntries = await fs.readdir(photosDir, { withFileTypes: true })
 
   const galleryDirs = dirEntries
@@ -91,3 +98,4 @@ generateManifest().catch((error) => {
   console.error('Failed to generate gallery manifest:', error)
   process.exit(1)
 })
+
