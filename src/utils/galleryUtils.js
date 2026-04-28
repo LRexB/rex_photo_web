@@ -3,6 +3,17 @@ import { IMAGE_BASE_URL } from '../config/imageConfig'
 
 let galleryManifestCache = null
 
+/**
+ * Build a properly encoded URL for a photo hosted on R2.
+ * Gallery IDs and filenames may contain spaces and special characters
+ * that must be percent-encoded in the URL path.
+ */
+function buildPhotoUrl(galleryId, filename) {
+  const encodedGallery = encodeURIComponent(galleryId)
+  const encodedFile = encodeURIComponent(filename)
+  return `${IMAGE_BASE_URL}/photos/${encodedGallery}/${encodedFile}`
+}
+
 const EXIF_TAGS_TO_PICK = [
   'DateTimeOriginal',
   'CreateDate',
@@ -140,7 +151,11 @@ async function loadGalleryManifest() {
   }
 
   try {
-    const response = await fetch(`${IMAGE_BASE_URL}/photos/gallery-manifest.json`, { cache: 'no-store' })
+    const cacheBuster = `_cb=${Date.now()}`
+    const response = await fetch(
+      `${IMAGE_BASE_URL}/photos/gallery-manifest.json?${cacheBuster}`,
+      { cache: 'no-store' }
+    )
     if (!response.ok) {
       throw new Error(`Manifest request failed: ${response.status}`)
     }
@@ -150,8 +165,8 @@ async function loadGalleryManifest() {
     return manifest
   } catch (error) {
     console.error('Could not load gallery manifest:', error)
-    galleryManifestCache = { galleries: [] }
-    return galleryManifestCache
+    // Do NOT cache failures — allow retries on next call
+    return { galleries: [] }
   }
 }
 
@@ -326,7 +341,7 @@ export async function scanGalleries() {
         let thumbnail = '/images/default-thumbnail.jpg'
         const photos = Array.isArray(gallery.photos) ? gallery.photos : []
         if (photos.length > 0) {
-          thumbnail = `${IMAGE_BASE_URL}/photos/${id}/${photos[0]}`
+          thumbnail = buildPhotoUrl(id, photos[0])
         }
 
         galleries.push({
@@ -353,8 +368,6 @@ export async function scanGalleries() {
  * @returns {Promise<array>} Array of photo objects
  */
 export async function getGalleryPhotos(galleryId) {
-  const photos = []
-
   const manifest = await loadGalleryManifest()
   const gallery = Array.isArray(manifest.galleries)
     ? manifest.galleries.find((item) => item.id === galleryId)
@@ -362,42 +375,38 @@ export async function getGalleryPhotos(galleryId) {
 
   const potentialFiles = Array.isArray(gallery?.photos) ? gallery.photos : []
 
-  for (const filename of potentialFiles) {
+  // Build photo list directly from the manifest — don't pre-fetch images
+  const photos = potentialFiles.map((filename) => {
+    const imageUrl = buildPhotoUrl(galleryId, filename)
+    const parsed = parsePhotoFilename(filename)
+
+    return {
+      id: parsed.number || filename.replace(/\./g, '_').replace(/\s/g, '_'),
+      filename,
+      title: parsed.displayTitle,
+      thumbnail: imageUrl,
+      fullsize: imageUrl,
+      metadata: normalizePhotoMetadata(null)
+    }
+  })
+
+  // Attempt EXIF extraction in background — never block photo display
+  for (const photo of photos) {
     try {
-      const imageUrl = `${IMAGE_BASE_URL}/photos/${galleryId}/${filename}`
-      const response = await fetch(imageUrl)
+      const response = await fetch(photo.fullsize)
       if (response.ok) {
-        const parsed = parsePhotoFilename(filename)
-
-        // Extract EXIF metadata
-        let metadata = normalizePhotoMetadata(null)
-
-        try {
-          const imageBlob = await response.blob()
-          const exifData = await parse(imageBlob, {
-            xmp: true,
-            pick: EXIF_TAGS_TO_PICK
-          })
-
-          if (exifData) {
-            metadata = normalizePhotoMetadata(exifData)
-          }
-        } catch (exifError) {
-          console.log(`Could not extract EXIF from ${filename}:`, exifError.message)
-        }
-
-        photos.push({
-          id: parsed.number || filename.replace(/\./g, '_').replace(/\s/g, '_'),
-          filename,
-          title: parsed.displayTitle,
-          thumbnail: imageUrl,
-          fullsize: imageUrl,
-          metadata
+        const imageBlob = await response.blob()
+        const exifData = await parse(imageBlob, {
+          xmp: true,
+          pick: EXIF_TAGS_TO_PICK
         })
+
+        if (exifData) {
+          photo.metadata = normalizePhotoMetadata(exifData)
+        }
       }
-    } catch (error) {
-      // File doesn't exist, continue
-      console.log(`Could not load ${filename}:`, error.message)
+    } catch (exifError) {
+      console.log(`Could not extract EXIF from ${photo.filename}:`, exifError.message)
     }
   }
 

@@ -174,6 +174,10 @@ When adding new galleries:
    ```
 6. Upload to Cloudflare R2:
    ```bash
+   # Upload a single new gallery (recommended)
+   bash scripts/upload-to-r2.sh 2024_03_15_SpringPortrait
+
+   # Or upload everything
    bash scripts/upload-to-r2.sh
    ```
 7. Verify at `https://images.rexbenning.com/photos/gallery-manifest.json`
