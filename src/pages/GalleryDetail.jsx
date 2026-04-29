@@ -4,7 +4,7 @@ import Header from '../components/Header'
 import PhotoGrid from '../components/PhotoGrid'
 import PhotoLightbox from '../components/PhotoLightbox'
 import Footer from '../components/Footer'
-import { getGalleryPhotos } from '../utils/galleryUtils'
+import { getGalleryPhotos, enrichPhotosWithExif } from '../utils/galleryUtils'
 import './GalleryDetail.css'
 
 function GalleryDetail({ galleries }) {
@@ -16,6 +16,8 @@ function GalleryDetail({ galleries }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let abortExif = null
+
     async function loadGallery() {
       // Find the gallery from all categories
       let gallery = galleries.all?.find(g => g.id === id) || null
@@ -33,10 +35,15 @@ function GalleryDetail({ galleries }) {
       if (gallery) {
         setCurrentGallery(gallery)
         
-        // Load actual photos from the gallery
+        // Load photos instantly from manifest (no image fetching)
         try {
           const galleryPhotos = await getGalleryPhotos(id)
           setPhotos(galleryPhotos)
+
+          // Stream EXIF metadata in the background
+          abortExif = enrichPhotosWithExif(galleryPhotos, (updated) => {
+            setPhotos(updated)
+          })
         } catch (error) {
           console.error('Error loading photos:', error)
           setPhotos([])
@@ -47,6 +54,10 @@ function GalleryDetail({ galleries }) {
     }
 
     loadGallery()
+
+    return () => {
+      if (abortExif) abortExif()
+    }
   }, [id, galleries])
 
   if (loading) {

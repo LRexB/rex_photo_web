@@ -363,7 +363,8 @@ export async function scanGalleries() {
 }
 
 /**
- * Get photos for a specific gallery
+ * Get photos for a specific gallery.
+ * Returns the photo list immediately from the manifest (no network wait).
  * @param {string} galleryId - Gallery ID
  * @returns {Promise<array>} Array of photo objects
  */
@@ -375,8 +376,8 @@ export async function getGalleryPhotos(galleryId) {
 
   const potentialFiles = Array.isArray(gallery?.photos) ? gallery.photos : []
 
-  // Build photo list directly from the manifest — don't pre-fetch images
-  const photos = potentialFiles.map((filename) => {
+  // Build photo list directly from the manifest — no image fetching
+  return potentialFiles.map((filename) => {
     const imageUrl = buildPhotoUrl(galleryId, filename)
     const parsed = parsePhotoFilename(filename)
 
@@ -389,28 +390,56 @@ export async function getGalleryPhotos(galleryId) {
       metadata: normalizePhotoMetadata(null)
     }
   })
+}
 
-  // Attempt EXIF extraction in background — never block photo display
-  for (const photo of photos) {
-    try {
-      const response = await fetch(photo.fullsize)
-      if (response.ok) {
-        const imageBlob = await response.blob()
-        const exifData = await parse(imageBlob, {
-          xmp: true,
-          pick: EXIF_TAGS_TO_PICK
+/**
+ * Enrich photos with EXIF metadata in the background.
+ * Uses Range requests to fetch only the first 64 KB of each image
+ * (enough for EXIF headers) instead of downloading the full file.
+ * Calls onUpdate after each photo's metadata is extracted so the
+ * UI can progressively update.
+ *
+ * @param {array} photos - Array of photo objects from getGalleryPhotos
+ * @param {function} onUpdate - Callback receiving the updated photos array
+ * @returns {function} Abort function to cancel pending fetches
+ */
+export function enrichPhotosWithExif(photos, onUpdate) {
+  const controller = new AbortController()
+
+  async function loadExif() {
+    for (const photo of photos) {
+      if (controller.signal.aborted) break
+
+      try {
+        // Only fetch the first 64 KB — EXIF lives in the file header
+        const response = await fetch(photo.fullsize, {
+          headers: { Range: 'bytes=0-65535' },
+          signal: controller.signal
         })
 
-        if (exifData) {
-          photo.metadata = normalizePhotoMetadata(exifData)
+        if (response.ok || response.status === 206) {
+          const imageBlob = await response.blob()
+          const exifData = await parse(imageBlob, {
+            xmp: true,
+            pick: EXIF_TAGS_TO_PICK
+          })
+
+          if (exifData) {
+            photo.metadata = normalizePhotoMetadata(exifData)
+            onUpdate([...photos])
+          }
+        }
+      } catch (exifError) {
+        if (exifError.name !== 'AbortError') {
+          console.log(`Could not extract EXIF from ${photo.filename}:`, exifError.message)
         }
       }
-    } catch (exifError) {
-      console.log(`Could not extract EXIF from ${photo.filename}:`, exifError.message)
     }
   }
 
-  return photos
+  loadExif()
+
+  return () => controller.abort()
 }
 
 export default {
