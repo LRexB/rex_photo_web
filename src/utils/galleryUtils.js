@@ -1,17 +1,28 @@
 import { parse } from 'exifr'
-import { IMAGE_BASE_URL } from '../config/imageConfig'
+import { IMAGE_BASE_URL, TRANSFORMS_ENABLED, IMAGE_TRANSFORMS } from '../config/imageConfig'
 
 let galleryManifestCache = null
 
 /**
  * Build a properly encoded URL for a photo hosted on R2.
- * Gallery IDs and filenames may contain spaces and special characters
- * that must be percent-encoded in the URL path.
+ * When a Cloudflare Image Transform is specified and transforms are enabled,
+ * the URL uses the /cdn-cgi/image/ prefix for on-the-fly optimization.
+ *
+ * @param {string} galleryId - Gallery directory name
+ * @param {string} filename - Image filename
+ * @param {string} [transform] - Optional Cloudflare transform params (e.g. 'width=400,quality=80,format=auto')
+ * @returns {string} Fully encoded image URL
  */
-function buildPhotoUrl(galleryId, filename) {
+function buildPhotoUrl(galleryId, filename, transform) {
   const encodedGallery = encodeURIComponent(galleryId)
   const encodedFile = encodeURIComponent(filename)
-  return `${IMAGE_BASE_URL}/photos/${encodedGallery}/${encodedFile}`
+  const rawPath = `/photos/${encodedGallery}/${encodedFile}`
+
+  if (transform && TRANSFORMS_ENABLED) {
+    return `${IMAGE_BASE_URL}/cdn-cgi/image/${transform}${rawPath}`
+  }
+
+  return `${IMAGE_BASE_URL}${rawPath}`
 }
 
 const EXIF_TAGS_TO_PICK = [
@@ -341,7 +352,7 @@ export async function scanGalleries() {
         let thumbnail = '/images/default-thumbnail.jpg'
         const photos = Array.isArray(gallery.photos) ? gallery.photos : []
         if (photos.length > 0) {
-          thumbnail = buildPhotoUrl(id, photos[0])
+          thumbnail = buildPhotoUrl(id, photos[0], IMAGE_TRANSFORMS.galleryCard)
         }
 
         galleries.push({
@@ -378,15 +389,15 @@ export async function getGalleryPhotos(galleryId) {
 
   // Build photo list directly from the manifest — no image fetching
   return potentialFiles.map((filename) => {
-    const imageUrl = buildPhotoUrl(galleryId, filename)
     const parsed = parsePhotoFilename(filename)
 
     return {
       id: parsed.number || filename.replace(/\./g, '_').replace(/\s/g, '_'),
       filename,
       title: parsed.displayTitle,
-      thumbnail: imageUrl,
-      fullsize: imageUrl,
+      thumbnail: buildPhotoUrl(galleryId, filename, IMAGE_TRANSFORMS.gridThumbnail),
+      fullsize: buildPhotoUrl(galleryId, filename, IMAGE_TRANSFORMS.lightbox),
+      raw: buildPhotoUrl(galleryId, filename),
       metadata: normalizePhotoMetadata(null)
     }
   })
@@ -412,7 +423,7 @@ export function enrichPhotosWithExif(photos, onUpdate) {
 
       try {
         // Only fetch the first 64 KB — EXIF lives in the file header
-        const response = await fetch(photo.fullsize, {
+        const response = await fetch(photo.raw, {
           headers: { Range: 'bytes=0-65535' },
           signal: controller.signal
         })
