@@ -14,7 +14,7 @@ function GalleryCard({ gallery, onClick }) {
       </div>
       <div className="gallery-card-content">
         <h3 className="gallery-card-title">{gallery.name}</h3>
-        <p className="gallery-card-date">{new Date(gallery.date).toLocaleDateString()}</p>
+        <p className="gallery-card-date">{new Date(gallery.date + 'T00:00:00').toLocaleDateString()}</p>
       </div>
     </button>
   )

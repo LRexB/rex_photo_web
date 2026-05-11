@@ -101,7 +101,7 @@ function GalleryDetail({ galleries }) {
           
           <div className="gallery-header">
             <h1>{currentGallery.name}</h1>
-            <p className="gallery-date">{new Date(currentGallery.date).toLocaleDateString()}</p>
+            <p className="gallery-date">{new Date(currentGallery.date + 'T00:00:00').toLocaleDateString()}</p>
           </div>
 
           <div className="gallery-description">
