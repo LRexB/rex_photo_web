@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "generate:galleries": "node scripts/generate-gallery-manifest.mjs",
-    "dev": "npm run generate:galleries && vite",
+    "dev": "npm run generate:galleries && vite --host",
     "build": "vite build",
     "prebuild": "npm run generate:galleries",
     "preview": "vite preview",

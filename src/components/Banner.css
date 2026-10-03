@@ -1,6 +1,6 @@
 .banner {
   position: relative;
-  height: 400px;
+  height: 340px;
   overflow: hidden;
   margin-top: 0;
 }
@@ -61,7 +61,7 @@
 
 @media (max-width: 768px) {
   .banner {
-    height: 250px;
+    height: 215px;
   }
   
   .banner-title {

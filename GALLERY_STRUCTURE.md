@@ -60,6 +60,13 @@ Featuring diverse subjects and candid moments from three different sessions thro
 
 The description can be multiple lines and will be displayed on the gallery detail page.
 
+### Featuring a Gallery
+
+To showcase a specific gallery in the **Featured Gallery** rotating display on the home page:
+- **Hashtag Method (Recommended)**: Add `#featured` to the gallery's `description.txt` (e.g. `#QuebecCity #PhotoTour #featured`). The system automatically spotlights that gallery.
+- **Config Method**: Alternatively, set `FEATURED_GALLERY_ID` in `src/config/featuredConfig.js` to the gallery folder name.
+- **Auto Fallback**: If no gallery has `#featured` and no config ID is set, the most recent gallery is automatically featured.
+
 ## Photo File Naming Convention
 
 Photos within a gallery should follow this naming pattern:

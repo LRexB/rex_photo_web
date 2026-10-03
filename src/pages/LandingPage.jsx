@@ -1,8 +1,10 @@
 import Header from '../components/Header'
 import Banner from '../components/Banner'
+import FeaturedGallery from '../components/FeaturedGallery'
 import GalleryRow from '../components/GalleryRow'
 import Footer from '../components/Footer'
 import './LandingPage.css'
+
 
 function LandingPage({ galleries, loading, searchState, onSearchStateChange }) {
   const searchQuery = searchState?.query || ''
@@ -66,6 +68,8 @@ function LandingPage({ galleries, loading, searchState, onSearchStateChange }) {
             <div className="loading">Loading galleries...</div>
           ) : (
             <div className="gallery-rows">
+              <FeaturedGallery galleries={galleries.all} />
+
               <form className="gallery-search" onSubmit={handleSearchSubmit}>
                 <label className="gallery-search-label" htmlFor="gallery-tag-search">
                   Search gallery hashtags

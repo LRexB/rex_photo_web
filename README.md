@@ -5,6 +5,10 @@ A modern, responsive web application for displaying photography portfolios. Buil
 ## Features
 
 - **Landing Page** with promotional banner and navigation menu
+- **Featured Gallery Showcase** with rotating slideshow above latest galleries:
+  - Ambient glowing backdrop, automatic rotation, and progress bar
+  - Interactive previous/next arrows, play/pause toggle, and thumbnail selector strip
+  - Configurable via `#featured` hashtag or `src/config/featuredConfig.js`
 - **Gallery Rows** with horizontally scrollable gallery previews:
   - Latest galleries
   - Recommended galleries
@@ -30,18 +34,20 @@ A modern, responsive web application for displaying photography portfolios. Buil
 │   ├── main.jsx             # React entry point
 │   ├── App.jsx              # Main app component with routing
 │   ├── config/
-│   │   └── imageConfig.js   # R2 image base URL configuration
+│   │   ├── imageConfig.js    # R2 image base URL configuration
+│   │   └── featuredConfig.js # Featured gallery selection & timing
 │   ├── pages/
 │   │   ├── LandingPage.jsx   # Home page
 │   │   └── GalleryDetail.jsx # Individual gallery page
 │   ├── components/
-│   │   ├── Header.jsx        # Navigation header
-│   │   ├── Banner.jsx        # Page banner with image
-│   │   ├── GalleryRow.jsx    # Horizontally scrollable row
-│   │   ├── GalleryCard.jsx   # Gallery preview card
-│   │   ├── PhotoGrid.jsx     # Photo grid display
-│   │   ├── PhotoLightbox.jsx # Full-size photo viewer
-│   │   └── Footer.jsx        # Page footer
+│   │   ├── Header.jsx          # Navigation header
+│   │   ├── Banner.jsx          # Page banner with image
+│   │   ├── FeaturedGallery.jsx # Rotating featured gallery slideshow
+│   │   ├── GalleryRow.jsx      # Horizontally scrollable row
+│   │   ├── GalleryCard.jsx     # Gallery preview card
+│   │   ├── PhotoGrid.jsx       # Photo grid display
+│   │   ├── PhotoLightbox.jsx   # Full-size photo viewer
+│   │   └── Footer.jsx          # Page footer
 │   └── utils/
 │       └── galleryUtils.js   # Gallery loading and EXIF extraction
 ├── public/

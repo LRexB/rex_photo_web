@@ -175,7 +175,17 @@ async function loadGalleryManifest() {
     galleryManifestCache = manifest
     return manifest
   } catch (error) {
-    console.error('Could not load gallery manifest:', error)
+    console.warn('Remote gallery manifest unavailable, attempting local fallback:', error.message)
+    try {
+      const localResponse = await fetch('/photos/gallery-manifest.json')
+      if (localResponse.ok) {
+        const localManifest = await localResponse.json()
+        galleryManifestCache = localManifest
+        return localManifest
+      }
+    } catch {
+      // Local fallback unavailable
+    }
     // Do NOT cache failures — allow retries on next call
     return { galleries: [] }
   }
@@ -361,7 +371,9 @@ export async function scanGalleries() {
           name: parsed.displayName,
           description: (gallery.description || '').trim(),
           tags: normalizeGalleryTags(gallery.tags),
-          thumbnail
+          thumbnail,
+          photos,
+          photoCount: photos.length
         })
       }
     } catch (error) {
@@ -396,6 +408,7 @@ export async function getGalleryPhotos(galleryId) {
       filename,
       title: parsed.displayTitle,
       thumbnail: buildPhotoUrl(galleryId, filename, IMAGE_TRANSFORMS.gridThumbnail),
+      featured: buildPhotoUrl(galleryId, filename, IMAGE_TRANSFORMS.featured || IMAGE_TRANSFORMS.lightbox),
       fullsize: buildPhotoUrl(galleryId, filename, IMAGE_TRANSFORMS.lightbox),
       raw: buildPhotoUrl(galleryId, filename),
       metadata: normalizePhotoMetadata(null)

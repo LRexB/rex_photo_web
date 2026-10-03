@@ -30,4 +30,8 @@ export const IMAGE_TRANSFORMS = {
 
   /** Lightbox full-size view */
   lightbox: 'width=1600,quality=85,format=auto',
+
+  /** Featured gallery rotating hero display */
+  featured: 'width=1400,quality=85,format=auto',
 }
+
