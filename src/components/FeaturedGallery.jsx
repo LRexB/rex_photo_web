@@ -206,18 +206,6 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
         />
         <div className="featured-vignette-overlay" aria-hidden="true" />
 
-        {/* Progress Bar Line */}
-        {photos.length > 1 && (
-          <div className="featured-progress-track">
-            <div
-              key={`${currentIndex}-${isPlaying}-${isHovered}`}
-              className={`featured-progress-bar ${!isPlaying || isHovered ? 'paused' : 'running'}`}
-              style={{
-                animationDuration: `${FEATURED_ROTATION_INTERVAL}ms`
-              }}
-            />
-          </div>
-        )}
 
         {/* Photo Viewport */}
         <div
@@ -321,35 +309,52 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
           </div>
         </div>
 
-        {/* Bottom Thumbnail Strip */}
+        {/* Bottom Thumbnail Strip with Discreet Progress Bar */}
         {photos.length > 1 && (
           <div
-            className="featured-thumbnail-strip"
+            className="featured-thumbs-container"
             onClick={(e) => e.stopPropagation()}
-            aria-label="Thumbnail previews"
+            aria-label="Thumbnail previews and rotation progress"
           >
-            {photos.map((photo, index) => {
-              const isActive = index === currentIndex
-              return (
-                <button
-                  key={photo.id || photo.filename}
-                  className={`featured-thumb-item ${isActive ? 'is-active' : ''}`}
-                  onClick={() => setCurrentIndex(index)}
-                  aria-label={`Show photo ${index + 1}: ${photo.title}`}
-                  aria-current={isActive ? 'true' : undefined}
-                >
-                  <img
-                    src={photo.thumbnail}
-                    alt={photo.title}
-                    className="featured-thumb-image"
-                    loading="lazy"
-                  />
-                  {isActive && <div className="featured-thumb-indicator" />}
-                </button>
-              )
-            })}
+            <div
+              className="featured-thumbnail-strip"
+              aria-label="Thumbnail previews"
+            >
+              {photos.map((photo, index) => {
+                const isActive = index === currentIndex
+                return (
+                  <button
+                    key={photo.id || photo.filename}
+                    className={`featured-thumb-item ${isActive ? 'is-active' : ''}`}
+                    onClick={() => setCurrentIndex(index)}
+                    aria-label={`Show photo ${index + 1}: ${photo.title}`}
+                    aria-current={isActive ? 'true' : undefined}
+                  >
+                    <img
+                      src={photo.thumbnail}
+                      alt={photo.title}
+                      className="featured-thumb-image"
+                      loading="lazy"
+                    />
+                    {isActive && <div className="featured-thumb-indicator" />}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Discreet Progress Bar Under Thumbnails */}
+            <div className="featured-progress-track">
+              <div
+                key={`${currentIndex}-${isPlaying}-${isHovered}`}
+                className={`featured-progress-bar ${!isPlaying || isHovered ? 'paused' : 'running'}`}
+                style={{
+                  animationDuration: `${FEATURED_ROTATION_INTERVAL}ms`
+                }}
+              />
+            </div>
           </div>
         )}
+
       </div>
     </section>
   )
