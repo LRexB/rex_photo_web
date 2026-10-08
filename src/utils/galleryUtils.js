@@ -402,6 +402,9 @@ export async function getGalleryPhotos(galleryId) {
   // Build photo list directly from the manifest — no image fetching
   return potentialFiles.map((filename) => {
     const parsed = parsePhotoFilename(filename)
+    const encodedGallery = encodeURIComponent(galleryId)
+    const encodedFile = encodeURIComponent(filename)
+    const localPath = `/photos/${encodedGallery}/${encodedFile}`
 
     return {
       id: parsed.number || filename.replace(/\./g, '_').replace(/\s/g, '_'),
@@ -411,6 +414,7 @@ export async function getGalleryPhotos(galleryId) {
       featured: buildPhotoUrl(galleryId, filename, IMAGE_TRANSFORMS.featured || IMAGE_TRANSFORMS.lightbox),
       fullsize: buildPhotoUrl(galleryId, filename, IMAGE_TRANSFORMS.lightbox),
       raw: buildPhotoUrl(galleryId, filename),
+      localPath,
       metadata: normalizePhotoMetadata(null)
     }
   })
@@ -436,12 +440,28 @@ export function enrichPhotosWithExif(photos, onUpdate) {
 
       try {
         // Only fetch the first 64 KB — EXIF lives in the file header
-        const response = await fetch(photo.raw, {
-          headers: { Range: 'bytes=0-65535' },
-          signal: controller.signal
-        })
+        let response
+        try {
+          response = await fetch(photo.raw, {
+            headers: { Range: 'bytes=0-65535' },
+            signal: controller.signal
+          })
+          if (!response.ok && response.status !== 206) {
+            throw new Error(`HTTP ${response.status}`)
+          }
+        } catch (fetchErr) {
+          // If remote fetch fails (e.g. CORS on localhost), try local path
+          if (photo.localPath) {
+            response = await fetch(photo.localPath, {
+              headers: { Range: 'bytes=0-65535' },
+              signal: controller.signal
+            })
+          } else {
+            throw fetchErr
+          }
+        }
 
-        if (response.ok || response.status === 206) {
+        if (response && (response.ok || response.status === 206)) {
           const imageBlob = await response.blob()
           const exifData = await parse(imageBlob, {
             xmp: true,
