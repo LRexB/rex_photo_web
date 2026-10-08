@@ -18,7 +18,7 @@
  */
 
 // Set to a gallery folder ID, partial name, or null for auto:
-export const FEATURED_GALLERY_ID = '2026_08_12_Summer Shots'
+export const FEATURED_GALLERY_ID = '2026_10_07_Battered Technology'
 
 // Slideshow rotation interval in milliseconds (e.g., 4500 = 4.5 seconds per photo)
 export const FEATURED_ROTATION_INTERVAL = 4500
@@ -40,7 +40,7 @@ export function resolveFeaturedGallery(galleries) {
   // 1. Check explicit ID/name from config
   if (FEATURED_GALLERY_ID && typeof FEATURED_GALLERY_ID === 'string') {
     const target = FEATURED_GALLERY_ID.trim().toLowerCase()
-    
+
     // Check exact ID match first
     const exactMatch = galleries.find((g) => g.id.toLowerCase() === target)
     if (exactMatch) return exactMatch
