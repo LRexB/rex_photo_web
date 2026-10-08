@@ -45,7 +45,11 @@ function PhotoLightbox({ photo, photos, onClose, onNext, onPrev }) {
               alt={photo.title}
               className="lightbox-image"
               onError={(e) => {
-                e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"%3E%3Crect fill="%23333" width="800" height="800"/%3E%3C/svg%3E'
+                if (photo.raw && e.target.src !== photo.raw) {
+                  e.target.src = photo.raw
+                } else {
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"%3E%3Crect fill="%23222" width="800" height="800"/%3E%3Ctext x="50%25" y="50%25" font-size="16" fill="%23666" text-anchor="middle" dy=".3em"%3EImage Unavailable%3C/text%3E%3C/svg%3E'
+                }
               }}
             />
           </div>

@@ -43,6 +43,13 @@ else
 fi
 echo ""
 
+# Regenerate manifest to ensure any new photos or galleries are indexed
+if [ -f "scripts/generate-gallery-manifest.mjs" ]; then
+    echo "📋 Updating local gallery manifest..."
+    node scripts/generate-gallery-manifest.mjs
+    echo ""
+fi
+
 # Count files
 FILE_COUNT=$(find "$SEARCH_DIR" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.webp" -o -name "*.json" -o -name "*.txt" \) | wc -l | tr -d ' ')
 echo "Found $FILE_COUNT files to upload"
