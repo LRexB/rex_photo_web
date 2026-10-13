@@ -95,9 +95,17 @@ function GalleryDetail({ galleries }) {
       
       <main className="gallery-detail-main">
         <div className="container">
-          <button onClick={() => navigate('/')} className="back-button">
-            ← Back to Home
-          </button>
+          <div className="gallery-detail-top-nav">
+            <button onClick={() => navigate('/')} className="back-button">
+              ← Back to Home
+            </button>
+            <button
+              onClick={() => navigate(`/gallery/${currentGallery.id}/explore`)}
+              className="explore-mode-button"
+            >
+              ✦ Full Page Explore View →
+            </button>
+          </div>
           
           <div className="gallery-header">
             <h1>{currentGallery.name}</h1>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import GalleryDetail from './pages/GalleryDetail'
+import GalleryExplore from './pages/GalleryExplore'
 import { scanGalleries, sortGalleriesByDate } from './utils/galleryUtils'
 import './App.css'
 
@@ -61,6 +62,7 @@ function App() {
           )}
         />
         <Route path="/gallery/:id" element={<GalleryDetail galleries={galleries} />} />
+        <Route path="/gallery/:id/explore" element={<GalleryExplore galleries={galleries} />} />
       </Routes>
     </Router>
   )

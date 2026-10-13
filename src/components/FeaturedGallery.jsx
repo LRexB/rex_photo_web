@@ -283,7 +283,7 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
       setIsPlaying((prev) => !prev)
     } else if (e.key === 'Enter') {
       if (gallery) {
-        navigate(`/gallery/${gallery.id}`)
+        navigate(`/gallery/${gallery.id}/explore?photo=${middlePhotoIndex}`)
       }
     }
   }
@@ -333,7 +333,7 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
 
         <button
           className="gallery-row-action featured-header-action"
-          onClick={() => navigate(`/gallery/${gallery.id}`)}
+          onClick={() => navigate(`/gallery/${gallery.id}/explore`)}
           aria-label={`Explore ${gallery.name} gallery`}
         >
           <span>Explore Gallery ({photos.length})</span>
@@ -412,20 +412,20 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
                     } ${isCenterVisible ? 'is-center' : ''}`}
                     onClick={() => {
                       if (slideState === 'idle') {
-                        navigate(`/gallery/${gallery.id}`)
+                        navigate(`/gallery/${gallery.id}/explore?photo=${item.index}`)
                       }
                     }}
-                    title={`Click to view ${gallery.name} gallery`}
+                    title={`Click to explore ${gallery.name} gallery`}
                     role="button"
                     tabIndex={item.offset >= 0 && item.offset < visibleCount ? 0 : -1}
                     aria-hidden={item.offset < 0 || item.offset >= visibleCount}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.stopPropagation()
-                        navigate(`/gallery/${gallery.id}`)
+                        navigate(`/gallery/${gallery.id}/explore?photo=${item.index}`)
                       }
                     }}
-                    aria-label={`Photo ${item.index + 1}: ${photo.title || 'Untitled'} - Click to view gallery`}
+                    aria-label={`Photo ${item.index + 1}: ${photo.title || 'Untitled'} - Click to explore gallery`}
                   >
                     <div className="featured-card-image-wrap">
                       <img
@@ -512,8 +512,8 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
         {/* Floating Glassmorphic Details Card */}
         <div
           className="featured-overlay-card"
-          onClick={() => navigate(`/gallery/${gallery.id}`)}
-          title={`Click to view full ${gallery.name} gallery`}
+          onClick={() => navigate(`/gallery/${gallery.id}/explore?photo=${displayIndex}`)}
+          title={`Click to explore ${gallery.name} gallery`}
         >
           <div className="featured-card-meta">
             <div className="featured-gallery-title-row">
