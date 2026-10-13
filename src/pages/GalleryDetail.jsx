@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import PhotoGrid from '../components/PhotoGrid'
@@ -9,7 +9,8 @@ import './GalleryDetail.css'
 
 function GalleryDetail({ galleries }) {
   const { id } = useParams()
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [currentGallery, setCurrentGallery] = useState(null)
   const [photos, setPhotos] = useState([])
   const [selectedPhoto, setSelectedPhoto] = useState(null)
@@ -33,7 +34,13 @@ function GalleryDetail({ galleries }) {
       }
 
       if (gallery) {
-        setCurrentGallery(gallery)
+          setCurrentGallery(gallery);
+          if (!searchParams.get('skipRedirect')) {
+            navigate(`/gallery/${id}/explore`, { replace: true });
+          }
+        } else {
+          setCurrentGallery(null);
+        }
         
         // Load photos instantly from manifest (no image fetching)
         try {
@@ -48,7 +55,7 @@ function GalleryDetail({ galleries }) {
           console.error('Error loading photos:', error)
           setPhotos([])
         }
-      }
+      
       
       setLoading(false)
     }
@@ -69,8 +76,13 @@ function GalleryDetail({ galleries }) {
         </div>
         <Footer />
       </>
-    )
+    );
   }
+
+
+
+
+
 
   if (!currentGallery) {
     return (

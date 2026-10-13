@@ -175,7 +175,7 @@ function GalleryExplore({ galleries }) {
   }, [navigate])
 
   const handleGoToRegularGallery = useCallback(() => {
-    navigate(`/gallery/${id}`)
+    navigate(`/gallery/${id}?skipRedirect=1`)
   }, [navigate, id])
 
   // 5. Keyboard Navigation
