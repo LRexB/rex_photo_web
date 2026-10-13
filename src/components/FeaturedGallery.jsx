@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   resolveFeaturedGallery,
@@ -13,11 +13,39 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
   const [gallery, setGallery] = useState(null)
   const [photos, setPhotos] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [slideState, setSlideState] = useState('idle') // 'idle' | 'sliding-next' | 'sliding-prev'
   const [isPlaying, setIsPlaying] = useState(FEATURED_AUTO_ROTATE)
   const [isHovered, setIsHovered] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [bgLayers, setBgLayers] = useState({ current: '', prev: '' })
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768
+    }
+    return false
+  })
+
+  // Responsive listener for mobile breakpoint (<= 768px)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mql = window.matchMedia('(max-width: 768px)')
+    const handleChange = (e) => {
+      setIsMobile(e.matches)
+    }
+
+    setIsMobile(mql.matches)
+
+    if (mql.addEventListener) {
+      mql.addEventListener('change', handleChange)
+      return () => mql.removeEventListener('change', handleChange)
+    } else {
+      mql.addListener(handleChange)
+      return () => mql.removeListener(handleChange)
+    }
+  }, [])
 
   const stageRef = useRef(null)
+  const trackRef = useRef(null)
   const touchStartX = useRef(null)
   const touchEndX = useRef(null)
 
@@ -54,6 +82,7 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
         if (isMounted) {
           setPhotos(items)
           setCurrentIndex(0)
+          setSlideState('idle')
           setLoading(false)
         }
       } catch (err) {
@@ -72,16 +101,40 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
     }
   }, [gallery?.id])
 
-  // Navigation handlers
+  // Navigation handlers: trigger smooth physical slide
   const goToNext = useCallback(() => {
-    if (photos.length <= 1) return
-    setCurrentIndex((prev) => (prev + 1) % photos.length)
-  }, [photos.length])
+    if (photos.length <= 1 || slideState !== 'idle') return
+    setSlideState('sliding-next')
+  }, [photos.length, slideState])
 
   const goToPrev = useCallback(() => {
-    if (photos.length <= 1) return
-    setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length)
-  }, [photos.length])
+    if (photos.length <= 1 || slideState !== 'idle') return
+    setSlideState('sliding-prev')
+  }, [photos.length, slideState])
+
+  // Complete slide transition and reset position seamlessly
+  const handleTransitionEnd = useCallback((e) => {
+    if (e && e.target !== trackRef.current) return
+    if (e && e.propertyName !== 'transform') return
+
+    if (slideState === 'sliding-next') {
+      setCurrentIndex((prev) => (prev + 1) % photos.length)
+      setSlideState('idle')
+    } else if (slideState === 'sliding-prev') {
+      setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length)
+      setSlideState('idle')
+    }
+  }, [slideState, photos.length])
+
+  // Safety fallback timer in case transitionend event is missed
+  useEffect(() => {
+    if (slideState !== 'idle') {
+      const timer = setTimeout(() => {
+        handleTransitionEnd({ target: trackRef.current, propertyName: 'transform' })
+      }, 720)
+      return () => clearTimeout(timer)
+    }
+  }, [slideState, handleTransitionEnd])
 
   // Auto-rotation timer
   useEffect(() => {
@@ -99,18 +152,123 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
     return () => clearInterval(intervalId)
   }, [isPlaying, isHovered, photos.length, goToNext])
 
-  // Preload the next photo in background for instantaneous transitions
+  // Calculate visible count: 1 on mobile, up to 3 on desktop
+  const visibleCount = useMemo(() => {
+    if (photos.length === 0) return 1
+    if (isMobile) return 1
+    return Math.min(3, photos.length)
+  }, [isMobile, photos.length])
+
+  // Track items: includes 1 left buffer card (offset -1) and 1 right buffer card (offset visibleCount)
+  // so the cards can smoothly scroll through the frame without popping.
+  const trackItems = useMemo(() => {
+    if (photos.length === 0) return []
+    if (photos.length === 1) {
+      return [{ offset: 0, photo: photos[0], index: 0 }]
+    }
+
+    const items = []
+    const total = photos.length
+
+    // Buffer card off-screen to the left
+    const leftIdx = (currentIndex - 1 + total) % total
+    items.push({
+      offset: -1,
+      photo: photos[leftIdx],
+      index: leftIdx
+    })
+
+    // Visible cards in the frame
+    for (let slot = 0; slot < visibleCount; slot++) {
+      const photoIdx = (currentIndex + slot) % total
+      items.push({
+        offset: slot,
+        photo: photos[photoIdx],
+        index: photoIdx
+      })
+    }
+
+    // Buffer card off-screen to the right
+    const rightIdx = (currentIndex + visibleCount) % total
+    items.push({
+      offset: visibleCount,
+      photo: photos[rightIdx],
+      index: rightIdx
+    })
+
+    return items
+  }, [photos, currentIndex, visibleCount])
+
+  // Active indices for thumbnails and info badges
+  const displayIndex = useMemo(() => {
+    if (slideState === 'sliding-next') return (currentIndex + 1) % photos.length
+    if (slideState === 'sliding-prev') return (currentIndex - 1 + photos.length) % photos.length
+    return currentIndex
+  }, [slideState, currentIndex, photos.length])
+
+  const visibleIndices = useMemo(() => {
+    if (photos.length === 0) return []
+    const list = []
+    for (let s = 0; s < visibleCount; s++) {
+      list.push((displayIndex + s) % photos.length)
+    }
+    return list
+  }, [displayIndex, visibleCount, photos.length])
+
+  // Identify the middle photo displayed in the frame
+  const middlePhotoIndex = useMemo(() => {
+    if (photos.length === 0) return 0
+    if (visibleCount >= 3) return (displayIndex + 1) % photos.length
+    return displayIndex % photos.length
+  }, [displayIndex, visibleCount, photos.length])
+
+  const middlePhoto = photos[middlePhotoIndex] || photos[displayIndex] || photos[0] || null
+  const middleImageSrc = middlePhoto?.featured || middlePhoto?.fullsize || middlePhoto?.thumbnail || ''
+
+  // Dual-layer state for smooth crossfading of the ambient middle photo backdrop
+  useEffect(() => {
+    if (!middleImageSrc) return
+    setBgLayers((prev) => {
+      if (prev.current === middleImageSrc) return prev
+      return {
+        current: middleImageSrc,
+        prev: prev.current || ''
+      }
+    })
+  }, [middleImageSrc])
+
+  // Preload upcoming photos in background for instantaneous transitions
   useEffect(() => {
     if (photos.length > 1) {
-      const nextIdx = (currentIndex + 1) % photos.length
-      const nextPhoto = photos[nextIdx]
-      const targetUrl = nextPhoto?.featured || nextPhoto?.fullsize
-      if (targetUrl) {
-        const preloadImg = new Image()
-        preloadImg.src = targetUrl
+      const preloadIndices = [
+        (currentIndex + 1) % photos.length,
+        (currentIndex + 2) % photos.length,
+        (currentIndex + 3) % photos.length,
+        (currentIndex - 1 + photos.length) % photos.length
+      ]
+      for (const idx of preloadIndices) {
+        const photo = photos[idx]
+        const targetUrl = photo?.featured || photo?.fullsize || photo?.thumbnail
+        if (targetUrl) {
+          const preloadImg = new Image()
+          preloadImg.src = targetUrl
+        }
       }
     }
   }, [currentIndex, photos])
+
+  // Thumbnail click handler: smoothly slides if adjacent, jumps directly if further away
+  const handleThumbnailClick = (index) => {
+    if (index === currentIndex || slideState !== 'idle') return
+
+    if (index === (currentIndex + 1) % photos.length) {
+      goToNext()
+    } else if (index === (currentIndex - 1 + photos.length) % photos.length) {
+      goToPrev()
+    } else {
+      setCurrentIndex(index)
+    }
+  }
 
   // Keyboard navigation
   const handleKeyDown = (e) => {
@@ -158,8 +316,7 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
     return null
   }
 
-  const currentPhoto = photos[currentIndex]
-  const displayImageSrc = currentPhoto?.featured || currentPhoto?.fullsize || currentPhoto?.thumbnail
+  const currentPhoto = photos[displayIndex] || photos[currentIndex]
 
   return (
     <section
@@ -198,36 +355,109 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Ambient Glowing Background (Blurred dynamic backdrop) */}
-        <div
-          className="featured-ambient-backdrop"
-          style={{ backgroundImage: `url(${displayImageSrc})` }}
-          aria-hidden="true"
-        />
-        <div className="featured-vignette-overlay" aria-hidden="true" />
+        {/* Softened Ambient Background of the Middle Photo */}
+        <div className="featured-ambient-container" aria-hidden="true">
+          {bgLayers.prev && bgLayers.prev !== bgLayers.current && (
+            <div
+              className="featured-ambient-backdrop is-prev"
+              style={{ backgroundImage: `url(${bgLayers.prev})` }}
+            />
+          )}
+          {bgLayers.current && (
+            <div
+              key={bgLayers.current}
+              className="featured-ambient-backdrop is-current"
+              style={{ backgroundImage: `url(${bgLayers.current})` }}
+            />
+          )}
+          <div className="featured-ambient-overlay" />
+        </div>
 
-
-        {/* Photo Viewport */}
+        {/* Photos Showcase Viewport: Continuous Smooth Scrolling Track */}
         <div
-          className="featured-photo-viewport"
-          onClick={() => navigate(`/gallery/${gallery.id}`)}
-          title={`Click to view full ${gallery.name} gallery`}
-          role="button"
-          tabIndex={-1}
+          className="featured-photos-viewport"
+          role="region"
+          aria-label={`${gallery.name} pictures carousel`}
         >
-          <img
-            key={currentPhoto.id || currentPhoto.filename}
-            src={displayImageSrc}
-            alt={currentPhoto.title || `${gallery.name} photo ${currentIndex + 1}`}
-            className="featured-active-photo"
-            onError={(e) => {
-              if (currentPhoto.raw && e.target.src !== currentPhoto.raw) {
-                e.target.src = currentPhoto.raw
-              } else if (currentPhoto.thumbnail && e.target.src !== currentPhoto.thumbnail) {
-                e.target.src = currentPhoto.thumbnail
-              }
+          <div
+            className={`featured-track-window items-${visibleCount} ${photos.length <= 1 ? 'has-single-photo' : ''}`}
+            style={{
+              '--visible-count': visibleCount
             }}
-          />
+          >
+            <div
+              ref={trackRef}
+              className={`featured-sliding-track ${
+                photos.length <= 1
+                  ? 'is-static'
+                  : slideState === 'sliding-next'
+                  ? 'is-sliding-next'
+                  : slideState === 'sliding-prev'
+                  ? 'is-sliding-prev'
+                  : 'is-idle'
+              }`}
+              onTransitionEnd={handleTransitionEnd}
+            >
+              {trackItems.map((item) => {
+                const photo = item.photo
+                const imgSrc = photo?.featured || photo?.fullsize || photo?.thumbnail
+                const isCenterVisible = visibleCount === 3 && item.offset === 1
+                const isLeadVisible = item.offset === 0
+
+                return (
+                  <div
+                    key={`track-slot-${item.offset}`}
+                    className={`featured-photo-card slot-offset-${item.offset} ${
+                      isLeadVisible ? 'is-lead' : ''
+                    } ${isCenterVisible ? 'is-center' : ''}`}
+                    onClick={() => {
+                      if (slideState === 'idle') {
+                        navigate(`/gallery/${gallery.id}`)
+                      }
+                    }}
+                    title={`Click to view ${gallery.name} gallery`}
+                    role="button"
+                    tabIndex={item.offset >= 0 && item.offset < visibleCount ? 0 : -1}
+                    aria-hidden={item.offset < 0 || item.offset >= visibleCount}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.stopPropagation()
+                        navigate(`/gallery/${gallery.id}`)
+                      }
+                    }}
+                    aria-label={`Photo ${item.index + 1}: ${photo.title || 'Untitled'} - Click to view gallery`}
+                  >
+                    <div className="featured-card-image-wrap">
+                      <img
+                        src={imgSrc}
+                        alt={photo.title || `${gallery.name} photo ${item.index + 1}`}
+                        className="featured-card-photo"
+                        onError={(e) => {
+                          if (photo.raw && e.target.src !== photo.raw) {
+                            e.target.src = photo.raw
+                          } else if (photo.thumbnail && e.target.src !== photo.thumbnail) {
+                            e.target.src = photo.thumbnail
+                          }
+                        }}
+                      />
+                      <div className="featured-card-hover-overlay" aria-hidden="true">
+                        <span className="featured-card-hover-action">Explore Gallery →</span>
+                      </div>
+                    </div>
+
+                    <div className="featured-card-caption">
+                      <span className="featured-card-photo-title" title={photo.title}>
+                        {photo.title || `Photo ${item.index + 1}`}
+                      </span>
+                      <span className="featured-card-badge">
+                        {item.index + 1}/{photos.length}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Previous & Next Arrows */}
@@ -294,10 +524,12 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
             
             <div className="featured-photo-title-row">
               <span className="featured-photo-title">
-                {currentPhoto.title || `Photo ${currentIndex + 1}`}
+                {currentPhoto?.title || gallery.name}
               </span>
               <span className="featured-counter-badge">
-                {currentIndex + 1} / {photos.length}
+                {visibleCount > 1
+                  ? `${displayIndex + 1}–${((displayIndex + visibleCount - 1) % photos.length) + 1} of ${photos.length}`
+                  : `${displayIndex + 1} / ${photos.length}`}
               </span>
             </div>
 
@@ -321,12 +553,13 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
               aria-label="Thumbnail previews"
             >
               {photos.map((photo, index) => {
-                const isActive = index === currentIndex
+                const isActive = index === displayIndex
+                const isInRow = visibleIndices.includes(index)
                 return (
                   <button
                     key={photo.id || photo.filename}
-                    className={`featured-thumb-item ${isActive ? 'is-active' : ''}`}
-                    onClick={() => setCurrentIndex(index)}
+                    className={`featured-thumb-item ${isActive ? 'is-active' : ''} ${isInRow ? 'is-in-row' : ''}`}
+                    onClick={() => handleThumbnailClick(index)}
                     aria-label={`Show photo ${index + 1}: ${photo.title}`}
                     aria-current={isActive ? 'true' : undefined}
                   >
