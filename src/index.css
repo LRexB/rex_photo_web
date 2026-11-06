@@ -20,7 +20,9 @@ body {
   line-height: 1.6;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
   height: 100%;
 }
@@ -41,4 +43,16 @@ img {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+/* Prevent browsers from showing the “grab” cursor on images */
+img {
+  -webkit-user-drag: none;
+  /* Chrome, Safari */
+  -khtml-user-drag: none;
+  /* Older KDE browsers */
+  user-drag: none;
+  /* Standardised pseudo‑property */
+  user-select: none;
+  /* Prevent text selection on double‑click */
 }
