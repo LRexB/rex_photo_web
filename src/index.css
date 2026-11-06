@@ -51,7 +51,7 @@ img {
   /* Chrome, Safari */
   -khtml-user-drag: none;
   /* Older KDE browsers */
-  user-drag: none;
+
   /* Standardised pseudo‑property */
   user-select: none;
   /* Prevent text selection on double‑click */
