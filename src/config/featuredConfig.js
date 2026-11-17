@@ -18,7 +18,7 @@
  */
 
 // Set to a gallery folder ID, partial name, or null for auto:
-export const FEATURED_GALLERY_ID =
+export const FEATURED_GALLERY_ID = null
 
 // Slideshow rotation interval in milliseconds (e.g., 4500 = 4.5 seconds per photo)
 export const FEATURED_ROTATION_INTERVAL = 4500
