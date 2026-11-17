@@ -7,7 +7,7 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate()
 
-  const menuItems = ['About', 'Contact', 'Help']
+  const menuItems = []
 
   return (
     <header className="header">
