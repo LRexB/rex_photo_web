@@ -519,18 +519,11 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
               <span className="featured-meta-separator">•</span>
               <span className="featured-gallery-date">{formatDate(gallery.date)}</span>
             </div>
-
-            <div className="featured-photo-title-row">
-              <span className="featured-photo-title">
-                {currentPhoto?.title || gallery.name}
-              </span>
-              <span className="featured-counter-badge">
-                {visibleCount > 1
-                  ? `${displayIndex + 1}–${((displayIndex + visibleCount - 1) % photos.length) + 1} of ${photos.length}`
-                  : `${displayIndex + 1} / ${photos.length}`}
-              </span>
-            </div>
-
+            {gallery.description && (
+              <p className="featured-gallery-desc">
+                {gallery.description}
+              </p>
+            )}
           </div>
         </div>
 
