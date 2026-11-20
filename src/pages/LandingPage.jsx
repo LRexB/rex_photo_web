@@ -61,7 +61,7 @@ function LandingPage({ galleries, loading, searchState, onSearchStateChange }) {
     <div className="landing-page">
       <Header />
       <Banner />
-      
+
       <main className="gallery-main">
         <div className="container">
           {loading ? (
@@ -69,6 +69,10 @@ function LandingPage({ galleries, loading, searchState, onSearchStateChange }) {
           ) : (
             <div className="gallery-rows">
               <FeaturedGallery galleries={galleries.all} />
+              <GalleryRow
+                title="Latest Galleries"
+                galleries={galleries.latest}
+              />
 
               <form className="gallery-search" onSubmit={handleSearchSubmit}>
                 <label className="gallery-search-label" htmlFor="gallery-tag-search">
@@ -109,16 +113,13 @@ function LandingPage({ galleries, loading, searchState, onSearchStateChange }) {
                 />
               ) : null}
 
-              <GalleryRow 
-                title="Latest Galleries" 
-                galleries={galleries.latest}
-              />
-              <GalleryRow 
-                title="Recommended" 
+
+              <GalleryRow
+                title="Recommended"
                 galleries={galleries.recommended}
               />
-              <GalleryRow 
-                title="Most Popular" 
+              <GalleryRow
+                title="Most Popular"
                 galleries={galleries.popular}
               />
             </div>
