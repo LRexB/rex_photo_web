@@ -387,15 +387,14 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
           >
             <div
               ref={trackRef}
-              className={`featured-sliding-track ${
-                photos.length <= 1
-                  ? 'is-static'
-                  : slideState === 'sliding-next'
+              className={`featured-sliding-track ${photos.length <= 1
+                ? 'is-static'
+                : slideState === 'sliding-next'
                   ? 'is-sliding-next'
                   : slideState === 'sliding-prev'
-                  ? 'is-sliding-prev'
-                  : 'is-idle'
-              }`}
+                    ? 'is-sliding-prev'
+                    : 'is-idle'
+                }`}
               onTransitionEnd={handleTransitionEnd}
             >
               {trackItems.map((item) => {
@@ -407,9 +406,8 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
                 return (
                   <div
                     key={`track-slot-${item.offset}`}
-                    className={`featured-photo-card slot-offset-${item.offset} ${
-                      isLeadVisible ? 'is-lead' : ''
-                    } ${isCenterVisible ? 'is-center' : ''}`}
+                    className={`featured-photo-card slot-offset-${item.offset} ${isLeadVisible ? 'is-lead' : ''
+                      } ${isCenterVisible ? 'is-center' : ''}`}
                     onClick={() => {
                       if (slideState === 'idle') {
                         navigate(`/gallery/${gallery.id}/explore?photo=${item.index}`)
@@ -521,7 +519,7 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
               <span className="featured-meta-separator">•</span>
               <span className="featured-gallery-date">{formatDate(gallery.date)}</span>
             </div>
-            
+
             <div className="featured-photo-title-row">
               <span className="featured-photo-title">
                 {currentPhoto?.title || gallery.name}
@@ -533,11 +531,6 @@ function FeaturedGallery({ galleries, featuredGalleryOverride }) {
               </span>
             </div>
 
-            {gallery.description && (
-              <p className="featured-gallery-desc">
-                {gallery.description}
-              </p>
-            )}
           </div>
         </div>
 
