@@ -14,7 +14,6 @@ function Footer() {
           <h3>Information</h3>
           <ul>
             <li><a href="#about" className="nav-link-construction" title="Under construction">About <span className="construction-badge">🔨</span></a></li>
-            <li><a href="mailto:me@rexbenning.com">Contact: info@rexbenning.com | <a href="tel:6134133877">(613) 413-3877</a></a></li>
             <li><a href="#help" className="nav-link-construction" title="Under construction">Help <span className="construction-badge">🔨</span></a></li>
           </ul>
         </div>
@@ -22,9 +21,9 @@ function Footer() {
         <div className="footer-section">
           <h3>Connect</h3>
           <ul>
+            <li><a href="mailto:me@rexbenning.com">Contact: info@rexbenning.com | <a href="tel:6134133877">(613) 413-3877</a></a></li>
             <li><a href="#" className="nav-link-construction" title="Under construction" onClick={handleConstructionClick}>Instagram <span className="construction-badge">🔨</span></a></li>
             <li><a href="#" className="nav-link-construction" title="Under construction" onClick={handleConstructionClick}>LinkedIn <span className="construction-badge">🔨</span></a></li>
-            <li><a href="#" className="nav-link-construction" title="Under construction" onClick={handleConstructionClick}>Portfolio <span className="construction-badge">🔨</span></a></li>
           </ul>
         </div>
 
